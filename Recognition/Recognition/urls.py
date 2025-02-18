@@ -16,10 +16,23 @@ Including another URLconf
 """
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from rest_framework import routers
 
-import settings
+import Recognition.settings
+from customers.views import CustomerViewSet, PassportViewSet, PassportScanViewSet, PageScanViewSet
+
+router = routers.DefaultRouter()
+router.register(r'customer', CustomerViewSet)
+router.register(r'passport', PassportViewSet)
+router.register(r'page_scan', PageScanViewSet)
+router.register(r'passportScan', PassportScanViewSet)
 
 urlpatterns = [
+    path('', include(router.urls)),
     path('admin/', admin.site.urls),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+
+]
+
+#urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

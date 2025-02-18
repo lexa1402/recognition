@@ -27,7 +27,7 @@ class Passport(models.Model):
     issue_date = models.DateField()
     ethnicity = models.CharField(max_length=16)
     personal_number = models.PositiveBigIntegerField()
-    pagescan = models.ManyToManyField('PageScan', through='PassportScan')
+    page_scan = models.ManyToManyField('PageScan', through='PassportScan')
     objects = models.Manager()
 
     def __str__(self):
@@ -46,8 +46,8 @@ class PageScan(models.Model):
 
     def __str__(self):
         try:
-            passportscan = PassportScan.objects.get(pagescan=self)
-            passport = Passport.objects.get(id=passportscan.passport.id)
+            passport_scan = PassportScan.objects.get(page_scan=self)
+            passport = Passport.objects.get(id=passport_scan.passport.id)
             customer = Customer.objects.get(id=passport.customer_ID.id)
             return f'{customer.first_name} {customer.last_name} ({self.page_number} стр.)'
         except PassportScan.DoesNotExist:
@@ -60,9 +60,9 @@ class PageScan(models.Model):
 
 class PassportScan(models.Model):
     passport = models.ForeignKey(Passport, on_delete=models.CASCADE)
-    pagescan = models.ForeignKey(PageScan, on_delete=models.CASCADE)
+    page_scan = models.ForeignKey(PageScan, on_delete=models.CASCADE)
     objects = models.Manager()
 
     def image(self):
-        pagescan = PageScan.objects.get(id=self.pagescan.id)
-        return pagescan.image
+        page_scan = PageScan.objects.get(id=self.page_scan.id)
+        return page_scan.image

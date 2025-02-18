@@ -18,6 +18,7 @@ class Customer(models.Model):
 
 class Passport(models.Model):
     customer_ID = models.ForeignKey(Customer, on_delete=models.CASCADE)
+    gender = models.CharField(choices=[('м', 'М'), ('ж', 'Ж')], default='М', max_length=1)
     citizenship = models.CharField(max_length=32)
     birth_date = models.DateField()
     document_ID = models.CharField(max_length=16)

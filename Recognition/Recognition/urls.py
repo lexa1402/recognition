@@ -19,7 +19,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import routers
 
-import Recognition.settings
+from Recognition.settings import MEDIA_ROOT, MEDIA_URL
 from customers.views import CustomerViewSet, PassportViewSet, PassportScanViewSet, PageScanViewSet
 
 router = routers.DefaultRouter()
@@ -32,7 +32,6 @@ urlpatterns = [
     path('', include(router.urls)),
     path('admin/', admin.site.urls),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-
 ]
 
-#urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(MEDIA_URL, document_root=MEDIA_ROOT)

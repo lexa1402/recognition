@@ -1,90 +1,118 @@
 # from django.shortcuts import render
-
-from rest_framework import permissions, viewsets, generics
-# from rest_framework import mixins, response
+from django.contrib.auth.models import User
+from rest_framework import permissions, generics
+# from rest_framework import mixins, response, viewsets
 # from django.http import HttpResponse, JsonResponse
 # from rest_framework.decorators import api_view
 # from rest_framework.response import Response
 # from rest_framework.views import APIView
 
 from customers.models import Customer, Passport, PassportScan, PageScan
-from customers.serializers import CustomerSerializer, PassportSerializer, PassportScanSerializer, PageScanSerializer
+from customers.serializers import CustomerSerializer, PassportSerializer, PassportScanSerializer, PageScanSerializer, \
+    UserSerializer
+from customers.permissions import IsOwnerOrReadOnly
 
 
 # ==================== Customers ====================
 
 
-class CustomerViewSet(viewsets.ModelViewSet):
-    queryset = Customer.objects.all()
-    serializer_class = CustomerSerializer
-    permission_classes = [permissions.IsAdminUser]
+# class CustomerViewSet(viewsets.ModelViewSet):
+#     queryset = Customer.objects.all()
+#     serializer_class = CustomerSerializer
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class CustomerList(generics.ListCreateAPIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class CustomerDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 # ==================== Passports ====================
 
 
-class PassportViewSet(viewsets.ModelViewSet):
-    queryset = Passport.objects.all()
-    serializer_class = PassportSerializer
-    permission_classes = [permissions.IsAdminUser]
+# class PassportViewSet(viewsets.ModelViewSet):
+#     queryset = Passport.objects.all()
+#     serializer_class = PassportSerializer
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class PassportList(generics.ListCreateAPIView):
     queryset = Passport.objects.all()
     serializer_class = PassportSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 class PassportDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Passport.objects.all()
     serializer_class = PassportSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 # ==================== PageScans ====================
 
 
-class PageScanViewSet(viewsets.ModelViewSet):
-    queryset = PageScan.objects.all()
-    serializer_class = PageScanSerializer
-    permission_classes = [permissions.IsAdminUser]
+# class PageScanViewSet(viewsets.ModelViewSet):
+#     queryset = PageScan.objects.all()
+#     serializer_class = PageScanSerializer
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class PageScanList(generics.ListCreateAPIView):
-    queryset = Customer.objects.all()
+    queryset = PageScan.objects.all()
     serializer_class = PageScanSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 class PageScanDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Customer.objects.all()
+    queryset = PageScan.objects.all()
     serializer_class = PageScanSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 # ==================== PassportScans ====================
 
 
-class PassportScanViewSet(viewsets.ModelViewSet):
-    queryset = PassportScan.objects.all()
-    serializer_class = PassportScanSerializer
-    permission_classes = [permissions.IsAdminUser]
+# class PassportScanViewSet(viewsets.ModelViewSet):
+#     queryset = PassportScan.objects.all()
+#     serializer_class = PassportScanSerializer
+#     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
 
 
 class PassportScanList(generics.ListCreateAPIView):
-    queryset = Customer.objects.all()
+    queryset = PassportScan.objects.all()
     serializer_class = PassportScanSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 class PassportScanDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Customer.objects.all()
+    queryset = PassportScan.objects.all()
     serializer_class = PassportScanSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+
+# ==================== Users ====================
+
+
+class UserList(generics.ListCreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 # ==================== What happens in APIViews without mixins ====================

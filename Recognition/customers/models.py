@@ -5,6 +5,7 @@ class Customer(models.Model):
     first_name = models.CharField(max_length=32)
     middle_name = models.CharField(max_length=32)
     last_name = models.CharField(max_length=32)
+    owner = models.ForeignKey('auth.User', related_name='customer', on_delete=models.CASCADE, null=True)
     objects = models.Manager()
 
     def __str__(self):

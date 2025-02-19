@@ -3,14 +3,27 @@ from django.contrib.auth.models import User
 from rest_framework import permissions, generics
 # from rest_framework import mixins, response, viewsets
 # from django.http import HttpResponse, JsonResponse
-# from rest_framework.decorators import api_view
-# from rest_framework.response import Response
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.response import Response
 # from rest_framework.views import APIView
+from rest_framework.reverse import reverse
 
 from customers.models import Customer, Passport, PassportScan, PageScan
 from customers.serializers import CustomerSerializer, PassportSerializer, PassportScanSerializer, PageScanSerializer, \
     UserSerializer
 from customers.permissions import IsOwnerOrReadOnly
+
+
+@api_view(['GET'])
+@permission_classes([permissions.AllowAny, ])
+def api_root(request):
+    return Response({
+        'users': reverse('user-list', request=request),
+        'customer': reverse('customer-list', request=request),
+        'passport': reverse('passport-list', request=request),
+        'pagescan': reverse('pagescan-list', request=request),
+        'passport-scan': reverse('passportscan-list', request=request),
+    })
 
 
 # ==================== Customers ====================
@@ -49,13 +62,13 @@ class CustomerDetail(generics.RetrieveUpdateDestroyAPIView):
 class PassportList(generics.ListCreateAPIView):
     queryset = Passport.objects.all()
     serializer_class = PassportSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 class PassportDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Passport.objects.all()
     serializer_class = PassportSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 # ==================== PageScans ====================
@@ -70,13 +83,13 @@ class PassportDetail(generics.RetrieveUpdateDestroyAPIView):
 class PageScanList(generics.ListCreateAPIView):
     queryset = PageScan.objects.all()
     serializer_class = PageScanSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 class PageScanDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = PageScan.objects.all()
     serializer_class = PageScanSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 # ==================== PassportScans ====================
@@ -91,13 +104,13 @@ class PageScanDetail(generics.RetrieveUpdateDestroyAPIView):
 class PassportScanList(generics.ListCreateAPIView):
     queryset = PassportScan.objects.all()
     serializer_class = PassportScanSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 class PassportScanDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = PassportScan.objects.all()
     serializer_class = PassportScanSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 # ==================== Users ====================
@@ -106,13 +119,13 @@ class PassportScanDetail(generics.RetrieveUpdateDestroyAPIView):
 class UserList(generics.ListCreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 class UserDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+    # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
 
 
 # ==================== What happens in APIViews without mixins ====================

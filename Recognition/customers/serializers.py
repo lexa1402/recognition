@@ -27,7 +27,7 @@ class CustomerSerializer(serializers.HyperlinkedModelSerializer):
 class PassportSerializer(serializers.HyperlinkedModelSerializer):
 
     id = serializers.IntegerField(read_only=True)
-    customer_ID = serializers.RelatedField(source='customer', read_only=True)
+    customer_ID = serializers.HyperlinkedRelatedField(read_only=True, view_name='customer-detail')
     gender = serializers.CharField(max_length=1)
     citizenship = serializers.CharField(max_length=32)
     birth_date = serializers.DateField()
@@ -38,7 +38,7 @@ class PassportSerializer(serializers.HyperlinkedModelSerializer):
     issue_date = serializers.DateField()
     ethnicity = serializers.CharField(max_length=16)
     personal_number = serializers.IntegerField()
-    page_scan = serializers.RelatedField(source='PageScan', read_only=True)
+    # page_scan = serializers.RelatedField(source='PageScan', read_only=True)
 
     def create(self, validated_data):
         return Passport.objects.create(**validated_data)
@@ -86,8 +86,8 @@ class PageScanSerializer(serializers.HyperlinkedModelSerializer):
 class PassportScanSerializer(serializers.HyperlinkedModelSerializer):
 
     id = serializers.IntegerField(read_only=True)
-    passport = serializers.RelatedField(source='Passport', read_only=True)
-    page_scan = serializers.RelatedField(source='Pagescan', read_only=True)
+    passport = serializers.HyperlinkedRelatedField(read_only=True, view_name='passport-detail')
+    page_scan = serializers.HyperlinkedRelatedField(read_only=True, view_name='pagescan-detail')
 
     def create(self, validated_data):
         return PassportScan.objects.create(**validated_data)

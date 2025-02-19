@@ -26,7 +26,7 @@ router = routers.DefaultRouter()
 router.register(r'customer', CustomerViewSet)
 router.register(r'passport', PassportViewSet)
 router.register(r'page_scan', PageScanViewSet)
-router.register(r'passportScan', PassportScanViewSet)
+router.register(r'passport_scan', PassportScanViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

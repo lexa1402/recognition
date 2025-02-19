@@ -10,7 +10,7 @@ class CustomerSerializer(serializers.HyperlinkedModelSerializer):
     first_name = serializers.CharField(max_length=32)
     middle_name = serializers.CharField(max_length=32)
     last_name = serializers.CharField(max_length=32)
-    owner = serializers.ReadOnlyField(source='owner.username')
+    # owner = serializers.ReadOnlyField(source='owner.username')
 
     def create(self, validated_data):
         return Customer.objects.create(**validated_data)
@@ -19,13 +19,13 @@ class CustomerSerializer(serializers.HyperlinkedModelSerializer):
         instance.first_name = validated_data.get('first_name', instance.first_name)
         instance.middle_name = validated_data.get('middle_name', instance.middle_name)
         instance.last_name = validated_data.get('last_name', instance.last_name)
-        instance.owner = validated_data.get('owner', instance.owner)
+        # instance.owner = validated_data.get('owner', instance.owner)
         instance.save()
         return instance
 
     class Meta:
         model = Customer
-        fields = ['url', 'id', 'first_name', 'middle_name', 'last_name', 'owner']
+        fields = ['url', 'id', 'first_name', 'middle_name', 'last_name', ]
 
 
 class PassportSerializer(serializers.HyperlinkedModelSerializer):
@@ -109,4 +109,4 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['url', 'id', 'username', 'customer']
+        fields = ['url', 'id', 'username', 'customer', ]

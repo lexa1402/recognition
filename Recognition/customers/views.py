@@ -1,32 +1,9 @@
-# from django.shortcuts import render
-from django.contrib.auth.models import User
-from rest_framework import permissions, viewsets
-# from rest_framework import mixins, response, generics
-# from django.http import HttpResponse, JsonResponse
-# from rest_framework.decorators import api_view, permission_classes
-# from rest_framework.response import Response
-# from rest_framework.views import APIView
-# from rest_framework.reverse import reverse
+from rest_framework import permissions, viewsets, status
+from rest_framework.response import Response
 
-from customers.models import Customer, Passport, PassportScan, PageScan
-from customers.serializers import CustomerSerializer, PassportSerializer, PassportScanSerializer, PageScanSerializer
-from customers.serializers import UserSerializer
-# from customers.permissions import IsOwnerOrReadOnly
-
-
-# @api_view(['GET'])
-# @permission_classes([permissions.AllowAny, ])
-# def api_root(request):
-#     return Response({
-#         'users': reverse('user-list', request=request),
-#         'customer': reverse('customer-list', request=request),
-#         'passport': reverse('passport-list', request=request),
-#         'pagescan': reverse('pagescan-list', request=request),
-#         'passport-scan': reverse('passportscan-list', request=request),
-#     })
-
-
-# ==================== Customers ====================
+from customers.models import Customer, Passport, PageScan
+from customers.serializers import CustomerSerializer, PassportSerializer, PageScanSerializer
+from recognition import get_passport_data
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -34,178 +11,45 @@ class CustomerViewSet(viewsets.ModelViewSet):
     serializer_class = CustomerSerializer
     permission_classes = [permissions.IsAdminUser]
 
-    # def perform_create(self, serializer):
-    #     serializer.save()
-
-
-# class CustomerList(generics.ListCreateAPIView):
-#     queryset = Customer.objects.all()
-#     serializer_class = CustomerSerializer
-#     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-#
-#     def perform_create(self, serializer):
-#         serializer.save(owner=self.request.user)
-#
-#
-# class CustomerDetail(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Customer.objects.all()
-#     serializer_class = CustomerSerializer
-#     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-
-
-# ==================== Passports ====================
-
 
 class PassportViewSet(viewsets.ModelViewSet):
     queryset = Passport.objects.all()
     serializer_class = PassportSerializer
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.AllowAny]
 
+    def create(self, request, *args, **kwargs):
 
-# class PassportList(generics.ListCreateAPIView):
-#     queryset = Passport.objects.all()
-#     serializer_class = PassportSerializer
-#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-#
-#
-# class PassportDetail(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = Passport.objects.all()
-#     serializer_class = PassportSerializer
-#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
+        context = {'request': request}
+        serializer = PassportSerializer(data=request.data, context=context)
 
+        if serializer.is_valid():
+            valid_data = False
 
-# ==================== PageScans ====================
+            for pagescan in serializer.validated_data['page_scan']:
+                passport_path = f'images/{pagescan.image.name}'
+                passport_data = get_passport_data(passport_path)
+                if passport_data['status'] == 'SUCCESS':
+                    valid_data = True
+                    for key in passport_data.keys():
+                        if key in request.data.keys():
+                            serializer.validated_data[key] = passport_data[key]
+
+            if not valid_data:
+                # !!! Fix here: Dict has no attribute "pk" issue !!!
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+            temp = serializer.validated_data['page_scan']
+            serializer.validated_data.pop('page_scan')
+
+            passport = Passport.objects.create(**serializer.validated_data)
+            for pagescan in temp:
+                passport.page_scan.add(pagescan)
+
+            return Response(PassportSerializer(passport, context=context).data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class PageScanViewSet(viewsets.ModelViewSet):
     queryset = PageScan.objects.all()
     serializer_class = PageScanSerializer
     permission_classes = [permissions.IsAdminUser]
-
-
-# class PageScanList(generics.ListCreateAPIView):
-#     queryset = PageScan.objects.all()
-#     serializer_class = PageScanSerializer
-#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-#
-#
-# class PageScanDetail(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = PageScan.objects.all()
-#     serializer_class = PageScanSerializer
-#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-
-
-# ==================== PassportScans ====================
-
-
-class PassportScanViewSet(viewsets.ModelViewSet):
-    queryset = PassportScan.objects.all()
-    serializer_class = PassportScanSerializer
-    permission_classes = [permissions.IsAdminUser]
-
-
-# class PassportScanList(generics.ListCreateAPIView):
-#     queryset = PassportScan.objects.all()
-#     serializer_class = PassportScanSerializer
-#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-#
-#
-# class PassportScanDetail(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = PassportScan.objects.all()
-#     serializer_class = PassportScanSerializer
-#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-
-
-# ==================== Users ====================
-
-
-class UserViewSet(viewsets.ModelViewSet):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
-    permission_classes = [permissions.IsAdminUser]
-
-
-# class UserList(generics.ListCreateAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-#
-#
-# class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserSerializer
-#     # permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
-
-
-# ==================== What happens in APIViews without mixins ====================
-#
-#
-# class CustomerList(APIView):
-#
-#     def get(self, request, format=None):
-#         customers = Customer.objects.all()
-#         serializer = CustomerSerializer(customers, many=True)
-#         return Response(serializer.data, status=status.HTTP_200_OK)
-#
-#     def post(self, request, format=None):
-#         serializer = CustomerSerializer(data=request.data)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#
-#
-# class CustomerDetail(APIView):
-#
-#     def get_object(self, pk):
-#         try:
-#             return Customer.objects.get(pk=pk)
-#         except Customer.DoesNotExist:
-#             return Response(status=status.HTTP_404_NOT_FOUND)
-#
-#     def get(self, request, pk, format=None):
-#         customer = self.get_object(pk)
-#         serializer = CustomerSerializer(customer)
-#         return Response(serializer.data)
-#
-#     def put(self, request, pk, format=None):
-#         customer = self.get_object(pk)
-#         serializer = CustomerSerializer(customer)
-#         if serializer.is_valid():
-#             serializer.save()
-#             return Response(serializer.data, status=status.HTTP_202_ACCEPTED)
-#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-#
-#     def delete(self, request, pk, format=None):
-#         customer = self.get_object(pk)
-#         customer.delete()
-#         return Response(status=status.HTTP_204_NO_CONTENT)
-#
-#
-# ==================== How to use mixins in APIViews ====================
-#
-#
-# class CustomerList(mixins.ListModelMixin, mixins.CreateModelMixin, generics.GenericAPIView):
-#     queryset = Customer.objects.all()
-#     serializer_class = CustomerSerializer
-#
-#     def get(self, request, *args, **kwargs):
-#         return self.list(request, *args, **kwargs)
-#
-#     def set(self, request, *args, **kwargs):
-#         return self.create(request, *args, **kwargs)
-#
-#
-# class CustomerDetail(mixins.RetrieveModelMixin, mixins.UpdateModelMixin,
-#                      mixins.DestroyModelMixin, generics.GenericAPIView):
-#     queryset = Customer.objects.all()
-#     serializer_class = CustomerSerializer
-#
-#     def get(self, request, *args, **kwargs):
-#         return self.retrieve(request, *args, **kwargs)
-#
-#     def update(self, request, *args, **kwargs):
-#         return self.update(request, *args, **kwargs)
-#
-#     def delete(self, request, *args, **kwargs):
-#         return self.destroy(request, *args, **kwargs)

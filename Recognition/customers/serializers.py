@@ -1,70 +1,24 @@
-from django.contrib.auth.models import User
-
-from customers.models import Customer, Passport, PassportScan, PageScan
 from rest_framework import serializers
+
+from customers.models import Customer, Passport, PageScan
 
 
 class CustomerSerializer(serializers.HyperlinkedModelSerializer):
 
     id = serializers.IntegerField(read_only=True)
-    first_name = serializers.CharField(max_length=32)
-    middle_name = serializers.CharField(max_length=32)
-    last_name = serializers.CharField(max_length=32)
-    # owner = serializers.ReadOnlyField(source='owner.username')
+    passport = serializers.HyperlinkedRelatedField(read_only=True, view_name='passport-detail')
 
     def create(self, validated_data):
         return Customer.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.first_name = validated_data.get('first_name', instance.first_name)
-        instance.middle_name = validated_data.get('middle_name', instance.middle_name)
-        instance.last_name = validated_data.get('last_name', instance.last_name)
-        # instance.owner = validated_data.get('owner', instance.owner)
+        instance.passport = validated_data.get('passport', instance.passport)
         instance.save()
         return instance
 
     class Meta:
         model = Customer
-        fields = ['url', 'id', 'first_name', 'middle_name', 'last_name', ]
-
-
-class PassportSerializer(serializers.HyperlinkedModelSerializer):
-
-    id = serializers.IntegerField(read_only=True)
-    customer_ID = serializers.HyperlinkedRelatedField(read_only=True, view_name='customer-detail')
-    gender = serializers.CharField(max_length=1)
-    citizenship = serializers.CharField(max_length=32)
-    birth_date = serializers.DateField()
-    document_ID = serializers.CharField(max_length=16)
-    expire_date = serializers.DateField()
-    birthplace = serializers.CharField(max_length=32)
-    authority = serializers.CharField(max_length=16)
-    issue_date = serializers.DateField()
-    ethnicity = serializers.CharField(max_length=16)
-    personal_number = serializers.IntegerField()
-
-    def create(self, validated_data):
-        return Passport.objects.create(**validated_data)
-
-    def update(self, instance, validated_data):
-        instance.customer_ID = validated_data.get('customer_ID', instance.customer_ID)
-        instance.gender = validated_data.get('gender', instance.gender)
-        instance.citizenship = validated_data.get('citizenship', instance.citizenship)
-        instance.birth_date = validated_data.get('birth_date', instance.birth_date)
-        instance.document_ID = validated_data.get('document_ID', instance.document_ID)
-        instance.expire_date = validated_data.get('expire_date', instance.expire_date)
-        instance.birthplace = validated_data.get('birthplace', instance.birthplace)
-        instance.authority = validated_data.get('authority', instance.authority)
-        instance.issue_date = validated_data.get('issue_date', instance.issue_date)
-        instance.ethnicity = validated_data.get('ethnicity', instance.ethnicity)
-        instance.personal_number = validated_data.get('personal_number', instance.personal_number)
-        instance.save()
-        return instance
-
-    class Meta:
-        model = Passport
-        fields = ['url', 'id', 'customer_ID', 'gender', 'citizenship', 'birth_date', 'document_ID', 'expire_date',
-                  'birthplace', 'authority', 'issue_date', 'ethnicity', 'personal_number', 'page_scan', ]
+        fields = ['url', 'id', 'passport', ]
 
 
 class PageScanSerializer(serializers.HyperlinkedModelSerializer):
@@ -85,28 +39,40 @@ class PageScanSerializer(serializers.HyperlinkedModelSerializer):
         fields = ['url', 'id', 'image', 'page_number', ]
 
 
-class PassportScanSerializer(serializers.HyperlinkedModelSerializer):
+class PassportSerializer(serializers.HyperlinkedModelSerializer):
 
     id = serializers.IntegerField(read_only=True)
-    passport = serializers.HyperlinkedRelatedField(read_only=True, view_name='passport-detail')
-    page_scan = serializers.HyperlinkedRelatedField(read_only=True, view_name='pagescan-detail')
+    issuer_code = serializers.CharField(max_length=32, allow_null=True)
+    surname = serializers.CharField(max_length=32, allow_null=True)
+    given_name = serializers.CharField(max_length=16, allow_null=True)
+    document_number = serializers.CharField(max_length=9, allow_null=True)
+    nationality_code = serializers.CharField(max_length=32, allow_null=True)
+    birth_date = serializers.DateField(allow_null=True)
+    sex = serializers.CharField(max_length=1, allow_null=True)
+    expiry_date = serializers.DateField(allow_null=True)
+    optional_data = serializers.CharField(max_length=14, allow_null=True)
+    page_scan = serializers.HyperlinkedRelatedField(many=True, view_name='pagescan-detail', queryset=PageScan.objects.all())
 
     def create(self, validated_data):
-        return PassportScan.objects.create(**validated_data)
+        instance = Passport.objects.create(**validated_data)
+        return instance
 
+    # Fix here: Setup Update of Validated Data
     def update(self, instance, validated_data):
-        instance.passport = validated_data.get('passport', instance.passport)
-        instance.page_scan = validated_data.get('page_scan', instance.page_scan)
+        instance.id = validated_data.get('id', instance.id)
+        instance.issuer_code = validated_data.get('issuer_code', instance.issuer_code)
+        instance.surname = validated_data.get('surname', instance.surname)
+        instance.given_name = validated_data.get('given_name', instance.given_name)
+        instance.document_number = validated_data.get('document_number', instance.document_number)
+        instance.nationality_code = validated_data.get('nationality_code', instance.nationality_code)
+        instance.birth_date = validated_data.get('birth_date', instance.birth_date)
+        instance.sex = validated_data.get('sex', instance.sex)
+        instance.expiry_date = validated_data.get('expiry_date', instance.expiry_date)
+        instance.optional_data = validated_data.get('optional_data', instance.optional_data)
+        instance.save()
+        return instance
 
     class Meta:
-        model = PassportScan
-        fields = ['url', 'id', 'passport', 'page_scan', ]
-
-
-class UserSerializer(serializers.ModelSerializer):
-
-    customer = serializers.HyperlinkedRelatedField(many=True, read_only=True, view_name='customer-detail')
-
-    class Meta:
-        model = User
-        fields = ['url', 'id', 'username', 'customer', ]
+        model = Passport
+        fields = ['url', 'id', 'issuer_code', 'surname', 'given_name', 'document_number', 'nationality_code',
+                  'birth_date', 'sex', 'expiry_date', 'optional_data', 'page_scan']

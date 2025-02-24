@@ -3,7 +3,7 @@ from rest_framework.response import Response
 
 from customers.models import Customer, Passport, PageScan
 from customers.serializers import CustomerSerializer, PassportSerializer, PageScanSerializer
-from recognition import get_passport_data
+from customers.recognition import get_passport_data
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -35,8 +35,7 @@ class PassportViewSet(viewsets.ModelViewSet):
                             serializer.validated_data[key] = passport_data[key]
 
             if not valid_data:
-                # !!! Fix here: Dict has no attribute "pk" issue !!!
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response(serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)
 
             temp = serializer.validated_data['page_scan']
             serializer.validated_data.pop('page_scan')

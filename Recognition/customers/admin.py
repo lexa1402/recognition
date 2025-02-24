@@ -18,9 +18,8 @@ class PageScanInline(admin.TabularInline):
     extra = 1
     readonly_fields = ['preview']
 
-    # !!! Fix here: Image previews do not load !!!
     def preview(self, obj):
-        return format_html(f'<img src="{obj.image.url}" width="100px" height="auto"/>')
+        return format_html(f'<img src="{obj.pagescan.image.url}" width="100px" height="auto"/>')
 
     preview.short_description = "Preview"
 
@@ -32,6 +31,8 @@ class CustomerAdmin(admin.ModelAdmin):
 
 @admin.register(Passport)
 class PassportAdmin(admin.ModelAdmin):
+    fields = ['issuer_code', 'surname', 'given_name', 'document_number', 'nationality_code', 'birth_date', 'sex',
+              'expiry_date', 'optional_data', ]
     inlines = [PageScanInline]
 
 

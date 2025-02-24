@@ -6,7 +6,7 @@ from customers.models import Customer, Passport, PageScan
 class CustomerSerializer(serializers.HyperlinkedModelSerializer):
 
     id = serializers.IntegerField(read_only=True)
-    passport = serializers.HyperlinkedRelatedField(read_only=True, view_name='passport-detail')
+    passport = serializers.HyperlinkedRelatedField(view_name='passport-detail', queryset=Passport.objects.all())
 
     def create(self, validated_data):
         return Customer.objects.create(**validated_data)
@@ -51,7 +51,9 @@ class PassportSerializer(serializers.HyperlinkedModelSerializer):
     sex = serializers.CharField(max_length=1, allow_null=True)
     expiry_date = serializers.DateField(allow_null=True)
     optional_data = serializers.CharField(max_length=14, allow_null=True)
-    page_scan = serializers.HyperlinkedRelatedField(many=True, view_name='pagescan-detail', queryset=PageScan.objects.all())
+    page_scan = serializers.HyperlinkedRelatedField(many=True,
+                                                    view_name='pagescan-detail',
+                                                    queryset=PageScan.objects.all())
 
     def create(self, validated_data):
         instance = Passport.objects.create(**validated_data)

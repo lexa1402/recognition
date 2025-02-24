@@ -26,7 +26,8 @@ class Passport(models.Model):
     birth_date = models.DateField()
     sex = models.CharField(choices=[('m', 'M'), ('f', 'F')], default='M', max_length=1)
     expiry_date = models.DateField()
-    optional_data = models.CharField(max_length=14)
+    optional_data_1 = models.CharField(max_length=14, null=True)
+    optional_data_2 = models.CharField(max_length=14, null=True)
     page_scan = models.ManyToManyField('PageScan')
     objects = models.Manager()
 

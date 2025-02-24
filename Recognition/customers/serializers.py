@@ -50,7 +50,8 @@ class PassportSerializer(serializers.HyperlinkedModelSerializer):
     birth_date = serializers.DateField(allow_null=True)
     sex = serializers.CharField(max_length=1, allow_null=True)
     expiry_date = serializers.DateField(allow_null=True)
-    optional_data = serializers.CharField(max_length=14, allow_null=True)
+    optional_data_1 = serializers.CharField(max_length=14, allow_null=True)
+    optional_data_2 = serializers.CharField(max_length=14, allow_null=True)
     page_scan = serializers.HyperlinkedRelatedField(many=True,
                                                     view_name='pagescan-detail',
                                                     queryset=PageScan.objects.all())
@@ -77,4 +78,4 @@ class PassportSerializer(serializers.HyperlinkedModelSerializer):
     class Meta:
         model = Passport
         fields = ['url', 'id', 'issuer_code', 'surname', 'given_name', 'document_number', 'nationality_code',
-                  'birth_date', 'sex', 'expiry_date', 'optional_data', 'page_scan']
+                  'birth_date', 'sex', 'expiry_date', 'optional_data_1', 'optional_data_2', 'page_scan']

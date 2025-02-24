@@ -32,7 +32,7 @@ class CustomerAdmin(admin.ModelAdmin):
 @admin.register(Passport)
 class PassportAdmin(admin.ModelAdmin):
     fields = ['issuer_code', 'surname', 'given_name', 'document_number', 'nationality_code', 'birth_date', 'sex',
-              'expiry_date', 'optional_data', ]
+              'expiry_date', 'optional_data_1', 'optional_data_2', ]
     inlines = [PageScanInline]
 
 

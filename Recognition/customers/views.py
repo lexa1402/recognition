@@ -33,6 +33,8 @@ class PassportViewSet(viewsets.ModelViewSet):
                     for key in passport_data.keys():
                         if key in request.data.keys():
                             serializer.validated_data[key] = passport_data[key]
+                    if 'optional_data' in passport_data.keys():
+                        serializer.validated_data['optional_data_1'] = passport_data['optional_data']
 
             if not valid_data:
                 return Response(serializer.error_messages, status=status.HTTP_400_BAD_REQUEST)

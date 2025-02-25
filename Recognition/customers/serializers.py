@@ -54,28 +54,20 @@ class PassportSerializer(serializers.HyperlinkedModelSerializer):
     optional_data_2 = serializers.CharField(max_length=14, allow_null=True)
     page_scan = serializers.HyperlinkedRelatedField(many=True,
                                                     view_name='pagescan-detail',
-                                                    queryset=PageScan.objects.all())
+                                                    queryset=PageScan.objects.all().order_by('-id'))
 
     def create(self, validated_data):
         instance = Passport.objects.create(**validated_data)
         return instance
 
-    # Fix here: Setup Update of Validated Data
     def update(self, instance, validated_data):
-        instance.id = validated_data.get('id', instance.id)
-        instance.issuer_code = validated_data.get('issuer_code', instance.issuer_code)
-        instance.surname = validated_data.get('surname', instance.surname)
-        instance.given_name = validated_data.get('given_name', instance.given_name)
-        instance.document_number = validated_data.get('document_number', instance.document_number)
-        instance.nationality_code = validated_data.get('nationality_code', instance.nationality_code)
-        instance.birth_date = validated_data.get('birth_date', instance.birth_date)
-        instance.sex = validated_data.get('sex', instance.sex)
-        instance.expiry_date = validated_data.get('expiry_date', instance.expiry_date)
-        instance.optional_data = validated_data.get('optional_data', instance.optional_data)
+        for attr in self.Meta.fields:
+            if attr not in ('url', 'page_scan'):
+                setattr(instance, attr, validated_data.get(attr, getattr(instance, attr)))
         instance.save()
         return instance
 
     class Meta:
         model = Passport
         fields = ['url', 'id', 'issuer_code', 'surname', 'given_name', 'document_number', 'nationality_code',
-                  'birth_date', 'sex', 'expiry_date', 'optional_data_1', 'optional_data_2', 'page_scan']
+                  'birth_date', 'sex', 'expiry_date', 'optional_data_1', 'optional_data_2', 'page_scan', ]

@@ -8,7 +8,7 @@ class Customer(models.Model):
 
     def __str__(self):
         passport = Passport.objects.get(pk=self.passport.id)
-        return f'{passport.surname} {passport.given_name}'
+        return f'{passport.surname.title()} {passport.given_name.title()}'
 
     class Meta:
         app_label = 'customers'
@@ -32,7 +32,7 @@ class Passport(models.Model):
     objects = models.Manager()
 
     def __str__(self):
-        return f'{self.surname} {self.given_name}'
+        return f'{self.surname.title()} {self.given_name.title()}'
 
     class Meta:
         app_label = 'customers'
@@ -48,7 +48,7 @@ class PageScan(models.Model):
     def __str__(self):
         try:
             passport = Passport.objects.filter(page_scan=self)[0]
-            return f'{passport.surname} {passport.given_name} ({self.page_number} стр.)'
+            return f'{passport.surname.title()} {passport.given_name.title()} ({self.page_number} стр.)'
         except IndexError:
             return f'[ Unknown Scan {self.id} ]'
 

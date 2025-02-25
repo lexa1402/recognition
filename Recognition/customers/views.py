@@ -1,9 +1,12 @@
+from django.http.response import HttpResponseRedirect
+from django.shortcuts import render
 from rest_framework import permissions, viewsets, status
 from rest_framework.response import Response
 
 from customers.models import Customer, Passport, PageScan
 from customers.serializers import CustomerSerializer, PassportSerializer, PageScanSerializer
 from customers.recognition import get_passport_data
+from customers.forms import PageScanForm
 
 
 class CustomerViewSet(viewsets.ModelViewSet):
@@ -54,3 +57,65 @@ class PageScanViewSet(viewsets.ModelViewSet):
     queryset = PageScan.objects.all()
     serializer_class = PageScanSerializer
     permission_classes = [permissions.IsAdminUser]
+
+
+def catalog(request):
+
+    url_name = request.resolver_match.url_name
+    context = {
+        'page': url_name,
+    }
+
+    if url_name == 'customers':
+        context['customers'] = Customer.objects.all()
+    elif url_name == 'passports':
+        context['passports'] = Passport.objects.all()
+    elif url_name == 'pagescans':
+        context['pagescans'] = PageScan.objects.all()
+
+    return render(request, 'customers/catalog.html', context=context)
+
+
+def customer(request, pk=None):
+
+    if request.method == 'GET':
+        context = {'passports': Passport.objects.all(),
+                   'fill': False, }
+        if pk:
+            context['customer'] = Customer.objects.get(pk=pk)
+            context['fill'] = True
+
+    return render(request, 'customers/customer.html', context)
+
+
+def passport(request, pk=None):
+
+    from customers.models import state_code
+
+    if request.method == 'GET':
+        context = {'passport': Passport.objects.get(pk=pk),
+                   'state_code': state_code,
+                   'fill': True, }
+
+    elif request.method == 'POST':
+        context = {'state_code': state_code,
+                   'fill': False, }
+
+    return render(request, 'customers/passport.html', context=context)
+
+
+def pagescan(request, pk=None):
+
+    if request.method == 'GET':
+        context = {'form': PageScanForm(),
+                   'fill': False}
+        if pk:
+            context['pagescan'] = PageScan.objects.get(pk=pk)
+            context['fill'] = True
+        return render(request, 'customers/pagescan.html', context)
+
+    elif request.method == 'POST':
+        form = PageScanForm(request.POST)
+        if form.is_valid():
+            return HttpResponseRedirect("/success/")
+        return HttpResponseRedirect("/bad_request/")

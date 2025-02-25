@@ -1,0 +1,99 @@
+{% extends 'customers/base.html' %}
+
+
+{% block content %}
+
+
+    <div class="row g-3">
+        <div class="col-md-12">
+            <h3 style="margin-top: 24px">Passport: {% if fill %} {{ passport }} {% else %} [Create] {% endif %} </h3>
+        </div>
+    </div>
+
+
+    <form class="row g-3" style="margin-top: 8px">
+        <div class="col-md-2">
+            <label for="issuer_code" class="form-label">Issuer:</label>
+            <select class="form-select" id="issuer_code">
+                {% for key, value in state_code.items %}
+                    <option {% if fill and key == passport.issuer_code %} selected {% endif %}
+                            value="{{ code }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label for="document_number" class="form-label">Document number:</label>
+            <input type="text" class="form-control" id="document_number" {% if fill %}
+                value="{{ passport.document_number }}"
+            {% endif %} >
+        </div>
+        <div class="col-md-2">
+            <label for="expiry_date" class="form-label">Expiry date:</label>
+            <input type="date" class="form-control" id="expiry_date" {% if fill %}
+                value="{{ passport.expiry_date.isoformat }}"
+            {% endif %} >
+        </div>
+        <div class="col-md-2">
+            <label for="optional_data_1" class="form-label">Optional 1:</label>
+            <input type="text" class="form-control" id="optional_data_1" {% if fill %}
+                value="{{ passport.optional_data_1 }}"
+            {% endif %} >
+        </div>
+        <div class="col-md-2">
+            <label for="optional_data_2" class="form-label">Optional 2:</label>
+            <input type="text" class="form-control" id="optional_data_2" {% if fill %}
+                value="{{ passport.optional_data_2 }}"
+            {% endif %} >
+        </div>
+
+
+        <div class="col-md-3">
+            <label for="surname" class="form-label">Surname:</label>
+            <input type="text" class="form-control" id="surname" {% if fill %}
+                value="{{ passport.surname }}"
+            {% endif %} >
+        </div>
+        <div class="col-md-4">
+            <label for="given_name" class="form-label">Given name:</label>
+            <input type="text" class="form-control" id="given_name" {% if fill %}
+                value="{{ passport.given_name }}"
+            {% endif %} >
+        </div>
+        <div class="col-md-2">
+            <label for="nationality_code" class="form-label">Nationality:</label>
+            <select class="form-select" id="nationality_code">
+                {% for key, value in state_code.items %}
+                    <option {% if fill and key == passport.nationality_code %} selected {% endif %}
+                            value="{{ code }}">{{ value }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-2">
+            <label for="birth_date" class="form-label">Birth date:</label>
+            <input type="date" class="form-control" id="birth_date" {% if fill %}
+                value="{{ passport.birth_date.isoformat }}"
+            {% endif %} >
+        </div>
+        <div class="col-md-1">
+            <label for="sex" class="form-label">Sex:</label>
+            <select class="form-select" id="sex">
+                <option {% if fill and passport.sex == 'M' %} selected {% endif %} value="M">M</option>
+                <option {% if fill and passport.sex == 'F' %} selected {% endif %} value="F">F</option>
+            </select>
+        </div>
+
+
+        {#        <div class="col-12">#}
+        {#            <div class="form-check">#}
+        {#                <input class="form-check-input" type="checkbox" id="scan_data">#}
+        {#                <label class="form-check-label" for="scan_data">#}
+        {#                    Scan data from passport#}
+        {#                </label>#}
+        {#            </div>#}
+        {#        </div>#}
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Save</button>
+        </div>
+    </form>
+{% endblock %}

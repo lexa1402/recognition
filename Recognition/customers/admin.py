@@ -26,7 +26,7 @@ class PageScanInline(admin.TabularInline):
 
 @admin.register(Customer)
 class CustomerAdmin(admin.ModelAdmin):
-    pass
+    fields = ['passport', 'address', 'phone_number', 'email', ]
 
 
 @admin.register(Passport)

@@ -2,4 +2,4 @@ from django import forms
 
 
 class PageScanForm(forms.Form):
-    image = forms.FileField(label='image')
+    image = forms.ImageField()

@@ -1,11 +1,13 @@
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
+from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
+from django.urls import reverse_lazy
 from rest_framework import permissions, viewsets, status
 from rest_framework.response import Response
 
 from customers.models import Customer, Passport, PageScan
 from customers.serializers import CustomerSerializer, PassportSerializer, PageScanSerializer
-from customers.recognition import get_passport_data
+from customers.recognition import get_passport_data, get_text_data
 from customers.forms import PageScanForm
 
 
@@ -76,46 +78,39 @@ def catalog(request):
     return render(request, 'customers/catalog.html', context=context)
 
 
-def customer(request, pk=None):
+class PageScanList(ListView):
+    model = PageScan
+    template_name = 'customers/pagescan-list.html'
+
+
+def pagescan_create(request):
 
     if request.method == 'GET':
-        context = {'passports': Passport.objects.all(),
-                   'fill': False, }
-        if pk:
-            context['customer'] = Customer.objects.get(pk=pk)
-            context['fill'] = True
-
-    return render(request, 'customers/customer.html', context)
-
-
-def passport(request, pk=None):
-
-    from customers.models import state_code
-
-    if request.method == 'GET':
-        context = {'passport': Passport.objects.get(pk=pk),
-                   'state_code': state_code,
-                   'fill': True, }
+        context = {'form': PageScanForm, }
+        return render(request, 'customers/pagescan-create.html', context)
 
     elif request.method == 'POST':
-        context = {'state_code': state_code,
-                   'fill': False, }
-
-    return render(request, 'customers/passport.html', context=context)
-
-
-def pagescan(request, pk=None):
-
-    if request.method == 'GET':
-        context = {'form': PageScanForm(),
-                   'fill': False}
-        if pk:
-            context['pagescan'] = PageScan.objects.get(pk=pk)
-            context['fill'] = True
-        return render(request, 'customers/pagescan.html', context)
-
-    elif request.method == 'POST':
-        form = PageScanForm(request.POST)
+        form = PageScanForm(request.POST, request.FILES)
         if form.is_valid():
-            return HttpResponseRedirect("/success/")
-        return HttpResponseRedirect("/bad_request/")
+            image = form.files.getlist('image')[0]
+            mrz_text = None
+            mrz_data = get_passport_data(image.file.name)
+            if mrz_data['status'] == 'SUCCESS':
+                mrz_text = mrz_data['mrz_text']
+            PageScan.objects.create(image=image, mrz_text=mrz_text)
+            return HttpResponseRedirect(reverse_lazy('customers:pagescan_list'))
+        return HttpResponseRedirect(reverse_lazy('customers:pagescan_list'))
+
+
+def pagescan_detail(request, pk):
+
+    if request.method == 'GET':
+        context = {'form': PageScanForm,
+                   'pagescan': PageScan.objects.get(pk=pk), }
+        return render(request, 'customers/pagescan-detail.html', context)
+
+
+class PageScanDelete(DeleteView):
+    model = PageScan
+    template_name = 'customers/pagescan-confirm-delete.html'
+    success_url = reverse_lazy('customers:pagescan_list')

@@ -1,0 +1,36 @@
+{% extends 'customers/base.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'customers:catalog' %}">Root</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'customers:pagescan_list' %}">Page Scans</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{ pagescan }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-3" style="margin-top: 24px">
+        <div class="col-md-6">
+            <h3>Page Scan: {{ pagescan }}</h3>
+        </div>
+        <div class="col-md-6 d-md-flex justify-content-md-end">
+            <a class="btn btn-danger" href="{% url 'customers:pagescan_delete' pagescan.id %}" role="button">Delete</a>
+        </div>
+    </div>
+
+    <form method="POST" action="" class="row g-3" style="margin-top: 8px">
+        {% csrf_token %}
+        <div class="col-md-3">
+            <label for="image" class="form-label">Image:</label>
+            <img src="{{ pagescan.image.url }}" alt="" style="width: 300px; height: auto; border-radius: 16px">
+        </div>
+        <div class="col-md-9">
+            <label for="mrz_text" class="form-label">MRZ data:</label>
+            <input type="text" class="form-control" id="mrz_text" disabled value="{{ pagescan.mrz_text }}">
+        </div>
+    </form>
+
+{% endblock %}

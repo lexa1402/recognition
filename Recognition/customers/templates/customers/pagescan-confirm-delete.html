@@ -1,0 +1,33 @@
+{% extends 'customers/base.html' %}
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'customers:catalog' %}">Root</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'customers:pagescan_list' %}">Page Scans</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'customers:pagescan_detail' object.id %}">{{ object }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">[Delete]</li>
+        </ol>
+    </nav>
+
+    <div class="row g-3" style="margin-top: 24px">
+        <div class="col-md-6">
+            <h3>Page Scan: {{ object }} [Delete]</h3>
+        </div>
+    </div>
+
+    <form method="post" class="row g-3" style="margin-top: 8px">
+        {% csrf_token %}
+        <div class="col-md-12">
+            <p>Are you sure you want to delete "{{ object }}"?</p>
+        </div>
+        {{ form|crispy }}
+        <div class="col-md-12">
+            <button class="btn btn-primary" type="submit" value="Confirm">Delete</button>
+        </div>
+    </form>
+
+{% endblock %}

@@ -2,11 +2,17 @@
 
 {% block content %}
 
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">Root</li>
+        </ol>
+    </nav>
+
     {% if page == 'catalog' %}
         <ul class="list-group" style="margin-top: 16px">
             <li class="list-group-item"><a href="{% url 'customers:customers' %}">Customers</a></li>
             <li class="list-group-item"><a href="{% url 'customers:passports' %}">Passports</a></li>
-            <li class="list-group-item"><a href="{% url 'customers:pagescans' %}">Page Scans</a></li>
+            <li class="list-group-item"><a href="{% url 'customers:pagescan_list' %}">Page Scans</a></li>
         </ul>
 
     {% elif page == 'customers' %}
@@ -66,38 +72,6 @@
                     <td><a href="{% url 'customers:passports_get' passport.id %}">{{ passport }}</a></td>
                     <td>{{ passport.document_number }}</td>
                     <td>{{ passport.expiry_date }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-
-    {% elif page == 'pagescans' %}
-
-        <div class="row g-3" style="margin-top: 16px">
-            <div class="col-md-6">
-                <h3>Page Scans:</h3>
-            </div>
-            <div class="col-md-6 d-md-flex justify-content-md-end">
-                <a class="btn btn-primary" href="{% url 'customers:pagescan_create' %}" role="button">Create</a>
-            </div>
-        </div>
-
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">id</th>
-                <th scope="col">Page Scan</th>
-                <th scope="col">Passport</th>
-                <th scope="col">Preview</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for pagescan in pagescans %}
-                <tr>
-                    <th scope="row">{{ pagescan.id }}</th>
-                    <td><a href="{% url 'customers:pagescan_get' pagescan.id %}">{{ pagescan }}</a></td>
-                    <td><a href="#">Solve here!</a></td>
-                    <td><img src="{{ pagescan.image.url }}" style="width: 100px; height: auto" alt=""></td>
                 </tr>
             {% endfor %}
             </tbody>

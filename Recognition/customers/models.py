@@ -51,7 +51,7 @@ class PageScan(models.Model):
             passport = Passport.objects.filter(page_scan=self)[0]
             return f'{passport.surname.title()} {passport.given_name.title()} ({self.id})'
         except IndexError:
-            return f'[ Unknown Scan {self.id} ]'
+            return f'[Unknown Scan {self.id}]'
 
     class Meta:
         app_label = 'customers'

@@ -1,0 +1,45 @@
+{% extends 'customers/base.html' %}
+
+
+{% block content %}
+
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'customers:catalog' %}">Root</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Passports</li>
+        </ol>
+    </nav>
+
+    <div class="row g-3" style="margin-top: 16px">
+        <div class="col-md-6">
+            <h3>Passports:</h3>
+        </div>
+        <div class="col-md-6 d-md-flex justify-content-md-end">
+{#            <a class="btn btn-primary" href="#" role="button">Create</a>#}
+            <a class="btn btn-primary" href="{% url 'customers:passport_create' %}" role="button">Create</a>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">id</th>
+            <th scope="col">Passport</th>
+            <th scope="col">Document no.</th>
+            <th scope="col">Expiry date</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for passport in passport_list %}
+            <tr>
+                <th scope="row">{{ passport.id }}</th>
+                <td><a href="{% url 'customers:passport_detail' passport.id %}">{{ passport }}</a></td>
+{#                <td><a href="#">{{ passport }}</a></td>#}
+                <td>{{ passport.document_number }}</td>
+                <td>{{ passport.expiry_date }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

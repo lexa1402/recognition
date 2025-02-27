@@ -8,75 +8,10 @@
         </ol>
     </nav>
 
-    {% if page == 'catalog' %}
-        <ul class="list-group" style="margin-top: 16px">
-            <li class="list-group-item"><a href="{% url 'customers:customers' %}">Customers</a></li>
-            <li class="list-group-item"><a href="{% url 'customers:passport_list' %}">Passports</a></li>
-            <li class="list-group-item"><a href="{% url 'customers:pagescan_list' %}">Page Scans</a></li>
-        </ul>
-
-    {% elif page == 'customers' %}
-
-        <div class="row g-3" style="margin-top: 16px">
-            <div class="col-md-6">
-                <h3>Clients:</h3>
-            </div>
-            <div class="col-md-6 d-md-flex justify-content-md-end">
-                <a class="btn btn-primary" href="{% url 'customers:customer_create' %}" role="button">Create</a>
-            </div>
-        </div>
-
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">id</th>
-                <th scope="col">Customer</th>
-                <th scope="col">Passport</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for customer in customers %}
-                <tr>
-                    <th scope="row">{{ customer.id }}</th>
-                    <td><a href="{% url 'customers:customer_get' customer.id %}">{{ customer }}</a></td>
-                    <td><a href="#">{{ customer }}</a></td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-
-    {% elif page == 'passports' %}
-
-        <div class="row g-3" style="margin-top: 16px">
-            <div class="col-md-6">
-                <h3>Passports:</h3>
-            </div>
-            <div class="col-md-6 d-md-flex justify-content-md-end">
-                <a class="btn btn-primary" href="{% url 'customers:passport_create' %}" role="button">Create</a>
-            </div>
-        </div>
-
-        <table class="table">
-            <thead>
-            <tr>
-                <th scope="col">id</th>
-                <th scope="col">Passport</th>
-                <th scope="col">Document no.</th>
-                <th scope="col">Expiry date</th>
-            </tr>
-            </thead>
-            <tbody>
-            {% for passport in passports %}
-                <tr>
-                    <th scope="row">{{ passport.id }}</th>
-                    <td><a href="{% url 'customers:passports_get' passport.id %}">{{ passport }}</a></td>
-                    <td>{{ passport.document_number }}</td>
-                    <td>{{ passport.expiry_date }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
-
-    {% endif %}
+    <ul class="list-group" style="margin-top: 16px">
+        <li class="list-group-item"><a href="{% url 'customers:customer_list' %}">Customers</a></li>
+        <li class="list-group-item"><a href="{% url 'customers:passport_list' %}">Passports</a></li>
+        <li class="list-group-item"><a href="{% url 'customers:pagescan_list' %}">Page Scans</a></li>
+    </ul>
 
 {% endblock %}

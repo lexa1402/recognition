@@ -1,0 +1,43 @@
+{% extends 'customers/base.html' %}
+
+
+{% block content %}
+
+    <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{% url 'customers:catalog' %}">Root</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Customers</li>
+        </ol>
+    </nav>
+
+    <div class="row g-3" style="margin-top: 24px">
+        <div class="col-md-6">
+            <h3>Customers:</h3>
+        </div>
+        <div class="col-md-6 d-md-flex justify-content-md-end">
+            <a class="btn btn-primary" href="{% url 'customers:customer_create' %}" role="button">Create</a>
+        </div>
+    </div>
+
+    <table class="table">
+        <thead>
+        <tr>
+            <th scope="col">id</th>
+            <th scope="col">Customer</th>
+            <th scope="col">Passport</th>
+            <th scope="col">Phone number</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for customer in customer_list %}
+            <tr>
+                <th scope="row">{{ customer.id }}</th>
+                <td><a href="{% url 'customers:customer_detail' customer.id %}">{{ customer }}</a></td>
+                <td><a href="{% url 'customers:passport_detail' customer.passport.id %}">{{ customer }}</a></td>
+                <td>{{ customer.phone_number }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+{% endblock %}

@@ -1,4 +1,5 @@
 {% extends 'customers/base.html' %}
+{% load crispy_forms_filters %}
 {% load crispy_forms_tags %}
 
 
@@ -27,87 +28,46 @@
         {% endif %}
     </div>
 
-    <form method="POST" class="row g-3" style="margin-top: 8px">
+    <form method="POST" class="row g-3" style="margin-top: 8px" novalidate>
         {% csrf_token %}
         <div class="col-md-2">
             {{ form.issuer_code|as_crispy_field }}
-            {#            <label for="issuer_code" class="form-label">Issuer:</label>#}
-            {#            <select class="form-select" id="issuer_code">#}
-            {#                {% for key, value in state_code.items %}#}
-            {#                    <option {% if key == passport.issuer_code %} selected {% endif %}#}
-            {#                                                                 value="{{ code }}">{{ value }}</option>#}
-            {#                {% endfor %}#}
-            {#            </select>#}
         </div>
         <div class="col-md-4">
             {{ form.document_number|as_crispy_field }}
-            {#            <label for="document_number" class="form-label">Document number:</label>#}
-            {#            <input type="text" class="form-control" id="document_number" {% if passport %}#}
-            {#                   value="{{ passport.document_number }}"#}
-            {#            {% endif %} >#}
         </div>
         <div class="col-md-2">
             {{ form.expiry_date|as_crispy_field }}
-            {#            <label for="expiry_date" class="form-label">Expiry date:</label>#}
-            {#            <input type="date" class="form-control" id="expiry_date" {% if passport %}#}
-            {#                   value="{{ passport.expiry_date.isoformat }}"#}
-            {#            {% endif %} >#}
         </div>
         <div class="col-md-2">
             {{ form.optional_data_1|as_crispy_field }}
-            {#            <label for="optional_data_1" class="form-label">Optional 1:</label>#}
-            {#            <input type="text" class="form-control" id="optional_data_1" {% if passport %}#}
-            {#                   value="{{ passport.optional_data_1 }}"#}
-            {#            {% endif %} >#}
         </div>
         <div class="col-md-2">
             {{ form.optional_data_2|as_crispy_field }}
-            {#            <label for="optional_data_2" class="form-label">Optional 2:</label>#}
-            {#            <input type="text" class="form-control" id="optional_data_2" {% if passport %}#}
-            {#                   value="{{ passport.optional_data_2 }}"#}
-            {#            {% endif %} >#}
         </div>
 
 
         <div class="col-md-3">
             {{ form.surname|as_crispy_field }}
-            {#            <label for="surname" class="form-label">Surname:</label>#}
-            {#            <input type="text" class="form-control" id="surname" {% if passport %}#}
-            {#                   value="{{ passport.surname }}"#}
-            {#            {% endif %} >#}
         </div>
         <div class="col-md-4">
             {{ form.given_name|as_crispy_field }}
-            {#            <label for="given_name" class="form-label">Given name:</label>#}
-            {#            <input type="text" class="form-control" id="given_name" {% if passport %}#}
-            {#                   value="{{ passport.given_name }}"#}
-            {#            {% endif %} >#}
         </div>
         <div class="col-md-2">
             {{ form.nationality_code|as_crispy_field }}
-            {#            <label for="nationality_code" class="form-label">Nationality:</label>#}
-            {#            <select class="form-select" id="nationality_code">#}
-            {#                {% for key, value in state_code.items %}#}
-            {#                    <option {% if key == passport.nationality_code %} selected {% endif %}#}
-            {#                                                                      value="{{ code }}">{{ value }}</option>#}
-            {#                {% endfor %}#}
-            {#            </select>#}
         </div>
         <div class="col-md-2">
             {{ form.birth_date|as_crispy_field }}
-            {#            <label for="birth_date" class="form-label">Birth date:</label>#}
-            {#            <input type="date" class="form-control" id="birth_date" {% if passport %}#}
-            {#                   value="{{ passport.birth_date.isoformat }}"#}
-            {#            {% endif %} >#}
         </div>
         <div class="col-md-1">
             {{ form.sex|as_crispy_field }}
-            {#            <label for="sex" class="form-label">Sex:</label>#}
-            {#            <select class="form-select" id="sex">#}
-            {#                <option {% if fill and passport.sex == 'M' %} selected {% endif %} value="M">M</option>#}
-            {#                <option {% if fill and passport.sex == 'F' %} selected {% endif %} value="F">F</option>#}
-            {#            </select>#}
         </div>
+
+
+        <div class="col-md-3">
+
+        </div>
+
 
         <div class="col-12">
             <button type="submit" class="btn btn-primary">Save</button>

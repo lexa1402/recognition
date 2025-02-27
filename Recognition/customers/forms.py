@@ -1,6 +1,7 @@
 from django import forms
+from django.db.models import Q
 
-from customers.models import Passport, Customer
+from customers.models import Passport, Customer, PageScan
 
 
 class PageScanForm(forms.Form):
@@ -8,11 +9,12 @@ class PageScanForm(forms.Form):
 
 
 class PassportForm(forms.ModelForm):
+    
+    page_scan = forms.ModelMultipleChoiceField(queryset=PageScan.objects.all(), required=True)
 
     class Meta:
         model = Passport
-        fields = ['issuer_code', 'surname', 'given_name', 'document_number', 'nationality_code', 'birth_date', 'sex',
-                  'expiry_date', 'optional_data_1', 'optional_data_2', ]
+        fields = ['page_scan', ]
 
 
 class CustomerForm(forms.ModelForm):

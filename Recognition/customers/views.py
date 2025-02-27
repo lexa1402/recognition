@@ -76,8 +76,18 @@ def passport_create(request):
     elif request.method == 'POST':
         form = PassportForm(request.POST)
         if form.is_valid():
-            form.save()
-            return HttpResponseRedirect(reverse_lazy('customers:passport_list'))
+            image = PageScan.objects.get(pk=form.data['page_scan'])
+            if image.mrz_text is not None:
+                mrz_data = get_text_data(image.mrz_text.replace('\\n', '\n'))
+                fields = ('issuer_code', 'surname', 'given_name', 'document_number', 'nationality_code', 'birth_date',
+                          'sex', 'expiry_date', 'optional_data_1', 'optional_data_2', )
+                data = dict()
+                for key in mrz_data.keys():
+                    if key in fields:
+                        data[key] = mrz_data[key]
+                passport = Passport.objects.create(**data)
+                passport.page_scan.add(image)
+                return HttpResponseRedirect(reverse_lazy('customers:passport_list'))
         return HttpResponseRedirect(reverse_lazy('customers:passport_list'))
 
 
@@ -87,7 +97,8 @@ def passport_detail(request, pk):
         passport = Passport.objects.get(pk=pk)
         context = {'passport': passport,
                    'form': PassportForm(instance=passport),
-                   'state_code': state_code, }
+                   'issuer_code': state_code[passport.issuer_code],
+                   'nationality_code': state_code[passport.nationality_code]}
         return render(request, 'customers/passport-detail.html', context)
 
     elif request.method == 'POST':

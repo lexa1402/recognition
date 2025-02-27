@@ -31,47 +31,76 @@
     <form method="POST" class="row g-3" style="margin-top: 8px" novalidate>
         {% csrf_token %}
         <div class="col-md-2">
-            {{ form.issuer_code|as_crispy_field }}
+            {#            {{ form.issuer_code|as_crispy_field }}#}
+            <label for="issuer_code" class="form-label">Issuer:</label>
+            <input type="text" class="form-control" id="issuer_code"
+                   value="{{ issuer_code }}" disabled>
         </div>
         <div class="col-md-4">
-            {{ form.document_number|as_crispy_field }}
+            {#            {{ form.document_number|as_crispy_field }}#}
+            <label for="document_number" class="form-label">Document number:</label>
+            <input type="text" class="form-control" id="document_number"
+                   value="{{ passport.document_number }}" disabled>
         </div>
         <div class="col-md-2">
-            {{ form.expiry_date|as_crispy_field }}
+            {#            {{ form.expiry_date|as_crispy_field }}#}
+            <label for="expiry_date" class="form-label">Expiry date:</label>
+            <input type="date" class="form-control" id="expiry_date"
+                   value="{{ passport.expiry_date.isoformat }}" disabled>
         </div>
         <div class="col-md-2">
-            {{ form.optional_data_1|as_crispy_field }}
+            {#            {{ form.optional_data_1|as_crispy_field }}#}
+            <label for="optional_data_1" class="form-label">Optional 1:</label>
+            <input type="text" class="form-control" id="optional_data_1"
+                   value="{{ passport.optional_data_1 }}" disabled>
         </div>
         <div class="col-md-2">
-            {{ form.optional_data_2|as_crispy_field }}
+            {#            {{ form.optional_data_2|as_crispy_field }}#}
+            <label for="optional_data_2" class="form-label">Optional 2:</label>
+            <input type="text" class="form-control" id="optional_data_2"
+                   value="{{ passport.optional_data_2 }}" disabled>
         </div>
 
 
         <div class="col-md-3">
-            {{ form.surname|as_crispy_field }}
+            {#            {{ form.surname|as_crispy_field }}#}
+            <label for="surname" class="form-label">Surname:</label>
+            <input type="text" class="form-control" id="surname"
+                   value="{{ passport.surname }}" disabled>
         </div>
         <div class="col-md-4">
-            {{ form.given_name|as_crispy_field }}
+            {#            {{ form.given_name|as_crispy_field }}#}
+            <label for="given_name" class="form-label">Given name:</label>
+            <input type="text" class="form-control" id="given_name"
+                   value="{{ passport.given_name }}" disabled>
         </div>
         <div class="col-md-2">
-            {{ form.nationality_code|as_crispy_field }}
+            {#            {{ form.nationality_code|as_crispy_field }}#}
+            <label for="nationality_code" class="form-label">Nationality:</label>
+            <input type="text" class="form-control" id="nationality_code"
+                   value="{{ nationality_code }}" disabled>
         </div>
         <div class="col-md-2">
-            {{ form.birth_date|as_crispy_field }}
+            {#            {{ form.birth_date|as_crispy_field }}#}
+            <label for="birth_date" class="form-label">Birth date:</label>
+            <input type="date" class="form-control" id="birth_date"
+                   value="{{ passport.birth_date.isoformat }}" disabled>
         </div>
         <div class="col-md-1">
-            {{ form.sex|as_crispy_field }}
+            {#            {{ form.sex|as_crispy_field }}#}
+            <label for="sex" class="form-label">Sex:</label>
+            <input type="text" class="form-control" id="sex"
+                   value="{{ passport.sex }}" disabled>
         </div>
 
-
-        <div class="col-md-3">
-
+        <div class="col-md-12">
+            {{ form.page_scan|as_crispy_field }}
         </div>
-
 
         <div class="col-12">
             <button type="submit" class="btn btn-primary">Save</button>
         </div>
+
     </form>
 
 {% endblock %}

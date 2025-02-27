@@ -10,7 +10,7 @@ class PageScanForm(forms.Form):
 
 class PassportForm(forms.ModelForm):
     
-    page_scan = forms.ModelMultipleChoiceField(queryset=PageScan.objects.all(), required=True)
+    page_scan = forms.ModelMultipleChoiceField(queryset=PageScan.objects.filter(~Q(mrz_text=None)), required=True)
 
     class Meta:
         model = Passport

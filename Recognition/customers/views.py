@@ -1,3 +1,5 @@
+from django.core.paginator import Paginator
+from django.db.models.functions import datetime
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.views.generic import ListView, DeleteView
@@ -23,6 +25,17 @@ class PageScanList(ListView):
     template_name = 'customers/pagescan-list.html'
 
 
+def pagescan_list(request):
+
+    page = int(request.GET.get('page', 1))
+
+    paginator = Paginator(PageScan.objects.all().order_by('-id'), 6)
+    current_page = paginator.page(page)
+
+    context = {'pagescan_list': current_page, }
+    return render(request, 'customers/pagescan-list.html', context)
+
+
 def pagescan_create(request):
 
     if request.method == 'GET':
@@ -37,17 +50,16 @@ def pagescan_create(request):
             mrz_data = get_passport_data(image.file.name)
             if mrz_data['status'] == 'SUCCESS':
                 mrz_text = mrz_data['mrz_text']
-            PageScan.objects.create(image=image, mrz_text=mrz_text)
+            PageScan.objects.create(image=image, mrz_text=mrz_text, created=datetime.datetime.now())
             return HttpResponseRedirect(reverse_lazy('customers:pagescan_list'))
         return HttpResponseRedirect(reverse_lazy('customers:pagescan_list'))
 
 
 def pagescan_detail(request, pk):
 
-    if request.method == 'GET':
-        context = {'form': PageScanForm,
-                   'pagescan': PageScan.objects.get(pk=pk), }
-        return render(request, 'customers/pagescan-detail.html', context)
+    context = {'form': PageScanForm,
+               'pagescan': PageScan.objects.get(pk=pk), }
+    return render(request, 'customers/pagescan-detail.html', context)
 
 
 class PageScanDelete(DeleteView):
@@ -64,6 +76,17 @@ class PageScanDelete(DeleteView):
 class PassportList(ListView):
     model = Passport
     template_name = 'customers/passport-list.html'
+
+
+def passport_list(request):
+
+    page = int(request.GET.get('page', 1))
+
+    paginator = Paginator(Passport.objects.all().order_by('-id'), 12)
+    current_page = paginator.page(page)
+
+    context = {'passport_list': current_page, }
+    return render(request, 'customers/passport-list.html', context)
 
 
 def passport_create(request):
@@ -85,7 +108,7 @@ def passport_create(request):
                 for key in mrz_data.keys():
                     if key in fields:
                         data[key] = mrz_data[key]
-                passport = Passport.objects.create(**data)
+                passport = Passport.objects.create(**data, created=datetime.datetime.now())
                 passport.page_scan.add(image)
                 return HttpResponseRedirect(reverse_lazy('customers:passport_list'))
         return HttpResponseRedirect(reverse_lazy('customers:passport_list'))
@@ -123,6 +146,17 @@ class PassportDelete(DeleteView):
 class CustomerList(ListView):
     model = Customer
     template_name = 'customers/customer-list.html'
+
+
+def customer_list(request):
+
+    page = int(request.GET.get('page', 1))
+
+    paginator = Paginator(Customer.objects.all().order_by('-id'), 12)
+    current_page = paginator.page(page)
+
+    context = {'customer_list': current_page, }
+    return render(request, 'customers/customer-list.html', context)
 
 
 def customer_create(request):

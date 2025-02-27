@@ -1,8 +1,10 @@
 {% extends 'customers/base.html' %}
+{% load customers_tags %}
 
 
 {% block content %}
 
+    <!-- Breadcrumb -->
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'customers:catalog' %}">Root</a></li>
@@ -10,6 +12,7 @@
         </ol>
     </nav>
 
+    <!-- Page header -->
     <div class="row g-3" style="margin-top: 24px">
         <div class="col-md-6">
             <h3>Page Scans:</h3>
@@ -19,14 +22,15 @@
         </div>
     </div>
 
+    <!-- Pagescans Table -->
     <table class="table">
         <thead>
         <tr>
             <th scope="col">id</th>
             <th scope="col">Page Scan</th>
-            <th scope="col">Passport</th>
             <th scope="col">MRZ</th>
             <th scope="col">Preview</th>
+            <th scope="col">Created</th>
         </tr>
         </thead>
         <tbody>
@@ -34,12 +38,41 @@
             <tr>
                 <th scope="row">{{ pagescan.id }}</th>
                 <td><a href="{% url 'customers:pagescan_detail' pagescan.id %}">{{ pagescan }}</a></td>
-                <td><a href="#">Solve here!</a></td>
                 <td>{% if pagescan.mrz_text %} OK {% else %} ERROR {% endif %} </td>
-                <td><img src="{{ pagescan.image.url }}" style="width: 100px; height: auto" alt=""></td>
+                <td>
+                    <a href="{% url 'customers:pagescan_detail' pagescan.id %}">
+                        <img src="{{ pagescan.image.url }}" style="width: 100px; height: auto" alt="">
+                    </a>
+                </td>
+                <td>{{ pagescan.created_delta }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+
+    <!-- Paginator -->
+    {% if pagescan_list.paginator.num_pages > 1 %}
+        <nav aria-label="Paginator">
+            <ul class="pagination">
+                <li class="page-item {% if not pagescan_list.has_previous %} disabled {% endif %}">
+                    <a class="page-link" href="{% if pagescan_list.has_previous %}?{% change_params page=pagescan_list.previous_page_number %}
+                    {% else %}#{% endif %}" tabindex="-1" aria-disabled="true">Previous</a>
+                </li>
+
+                {% for page in pagescan_list.paginator.page_range %}
+                    {% if page >= pagescan_list.number|add:-2 and page <= pagescan_list.number|add:2 %}
+                        <li class="page-item {% if page == pagescan_list.number %} active {% endif %}" aria-current="page">
+                            <a class="page-link" href="?{% change_params page=page %}">{{ page }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                <li class="page-item {% if not pagescan_list.has_next %} disabled {% endif %}">
+                    <a class="page-link" href="{% if pagescan_list.has_next %}?{% change_params page=pagescan_list.next_page_number %}
+                    {% else %}#{% endif %} ">Next</a>
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
 
 {% endblock %}

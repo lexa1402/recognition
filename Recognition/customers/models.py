@@ -1,4 +1,18 @@
 from django.db import models
+from django.db.models.functions import datetime
+from django.templatetags.tz import utc
+from django.utils import timezone
+
+
+def time_delta_format(value):
+    delta = int((datetime.datetime.now(tz=timezone.utc) - value).total_seconds() + 21600)
+    dividers = {'second': 60, 'minute': 60, 'hour': 24, 'day': 7, 'week': 4, 'month': 12, 'year': 12}
+    if delta == 0:
+        return 'Just now'
+    for key in dividers.keys():
+        if delta < dividers[key]:
+            return f'{delta} {key}{(delta != 1) * "s"} ago'
+        delta //= dividers[key]
 
 
 class Customer(models.Model):
@@ -6,7 +20,12 @@ class Customer(models.Model):
     address = models.CharField(max_length=64, null=True, blank=True)
     phone_number = models.CharField(max_length=16, null=True, blank=True)
     email = models.CharField(max_length=32, null=True, blank=True)
+    created = models.DateTimeField()
     objects = models.Manager()
+
+    @property
+    def created_delta(self):
+        return time_delta_format(self.created)
 
     def __str__(self):
         passport = Passport.objects.get(pk=self.passport.id)
@@ -30,7 +49,12 @@ class Passport(models.Model):
     optional_data_1 = models.CharField(max_length=14, null=True, blank=True)
     optional_data_2 = models.CharField(max_length=14, null=True, blank=True)
     page_scan = models.ManyToManyField('PageScan')
+    created = models.DateTimeField()
     objects = models.Manager()
+
+    @property
+    def created_delta(self):
+        return time_delta_format(self.created)
 
     def __str__(self):
         return f'{self.surname.title()} {self.given_name.title()}'
@@ -44,7 +68,12 @@ class Passport(models.Model):
 class PageScan(models.Model):
     image = models.ImageField()
     mrz_text = models.CharField(max_length=96, null=True)
+    created = models.DateTimeField()
     objects = models.Manager()
+
+    @property
+    def created_delta(self):
+        return time_delta_format(self.created)
 
     def __str__(self):
         try:

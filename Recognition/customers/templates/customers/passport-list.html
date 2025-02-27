@@ -1,8 +1,10 @@
 {% extends 'customers/base.html' %}
+{% load customers_tags %}
 
 
 {% block content %}
 
+    <!-- Breadcrumb -->
     <nav style="--bs-breadcrumb-divider: '>';" aria-label="breadcrumb">
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'customers:catalog' %}">Root</a></li>
@@ -10,7 +12,8 @@
         </ol>
     </nav>
 
-    <div class="row g-3" style="margin-top: 16px">
+    <!-- Page header -->
+    <div class="row g-3" style="margin-top: 24px">
         <div class="col-md-6">
             <h3>Passports:</h3>
         </div>
@@ -20,6 +23,7 @@
         </div>
     </div>
 
+    <!-- Passports table -->
     <table class="table">
         <thead>
         <tr>
@@ -27,6 +31,7 @@
             <th scope="col">Passport</th>
             <th scope="col">Document no.</th>
             <th scope="col">Expiry date</th>
+            <th scope="col">Created</th>
         </tr>
         </thead>
         <tbody>
@@ -37,9 +42,35 @@
 {#                <td><a href="#">{{ passport }}</a></td>#}
                 <td>{{ passport.document_number }}</td>
                 <td>{{ passport.expiry_date }}</td>
+                <td>{{ passport.created_delta }}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+
+    <!-- Paginator -->
+    {% if passport_list.paginator.num_pages > 1 %}
+        <nav aria-label="Paginator">
+            <ul class="pagination">
+                <li class="page-item {% if not passport_list.has_previous %} disabled {% endif %}">
+                    <a class="page-link" href="{% if passport_list.has_previous %}?{% change_params page=passport_list.previous_page_number %}
+                    {% else %}#{% endif %}" tabindex="-1" aria-disabled="true">Previous</a>
+                </li>
+
+                {% for page in passport_list.paginator.page_range %}
+                    {% if page >= passport_list.number|add:-2 and page <= passport_list.number|add:2 %}
+                        <li class="page-item {% if page == passport_list.number %} active {% endif %}" aria-current="page">
+                            <a class="page-link" href="?{% change_params page=page %}">{{ page }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+
+                <li class="page-item {% if not passport_list.has_next %} disabled {% endif %}">
+                    <a class="page-link" href="{% if passport_list.has_next %}?{% change_params page=passport_list.next_page_number %}
+                    {% else %}#{% endif %} ">Next</a>
+                </li>
+            </ul>
+        </nav>
+    {% endif %}
 
 {% endblock %}

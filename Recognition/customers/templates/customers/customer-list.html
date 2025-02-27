@@ -18,15 +18,21 @@
             <h3>Customers:</h3>
         </div>
         <div class="col-md-6 d-md-flex justify-content-md-end">
-            <a class="btn btn-primary" href="{% url 'customers:customer_create' %}" role="button">Create</a>
+            <div class="btn-group me-2">
+                <a class="btn btn-primary" href="{% url 'customers:customer_create' %}" role="button">Create</a>
+            </div>
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-danger" id="deleteButton" disabled>Delete</button>
+            </div>
         </div>
     </div>
 
     <!-- Customers table -->
-    <table class="table">
+    <table class="table" style="margin-top: 16px">
         <thead>
         <tr>
             <th scope="col">id</th>
+            <th scope="col"><input class="form-check-input" type="checkbox" id="selectAllCheckBox" value=""></th>
             <th scope="col">Customer</th>
             <th scope="col">Passport</th>
             <th scope="col">Phone number</th>
@@ -37,6 +43,7 @@
         {% for customer in customer_list %}
             <tr>
                 <th scope="row">{{ customer.id }}</th>
+                <th><input class="form-check-input" type="checkbox" id="checkboxNoLabel" value=""></th>
                 <td><a href="{% url 'customers:customer_detail' customer.id %}">{{ customer }}</a></td>
                 <td><a href="{% url 'customers:passport_detail' customer.passport.id %}">{{ customer }}</a></td>
                 <td>{{ customer.phone_number }}</td>
@@ -70,5 +77,30 @@
             </ul>
         </nav>
     {% endif %}
+
+    <!-- CheckBox Script -->
+    <script>
+
+        const selectAllCheckBox = document.getElementById("selectAllCheckBox");
+        const checkboxes = document.querySelectorAll(".form-check-input");
+        const deleteButton = document.getElementById("deleteButton");
+
+        function toggleDeleteButton(){
+            const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+            deleteButton.disabled = !anyChecked
+        }
+
+        selectAllCheckBox.addEventListener('change', function () {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            })
+            toggleDeleteButton();
+        })
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', toggleDeleteButton);
+        })
+
+    </script>
 
 {% endblock %}

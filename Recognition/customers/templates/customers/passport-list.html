@@ -18,16 +18,21 @@
             <h3>Passports:</h3>
         </div>
         <div class="col-md-6 d-md-flex justify-content-md-end">
-{#            <a class="btn btn-primary" href="#" role="button">Create</a>#}
-            <a class="btn btn-primary" href="{% url 'customers:passport_create' %}" role="button">Create</a>
+            <div class="btn-group me-2">
+                <a class="btn btn-primary" href="{% url 'customers:passport_create' %}" role="button">Create</a>
+            </div>
+            <div class="btn-group me-2">
+                <button type="button" class="btn btn-danger" id="deleteButton" disabled>Delete</button>
+            </div>
         </div>
     </div>
 
     <!-- Passports table -->
-    <table class="table">
+    <table class="table" style="margin-top: 16px">
         <thead>
         <tr>
             <th scope="col">id</th>
+            <th scope="col"><input class="form-check-input" type="checkbox" id="selectAllCheckBox" value=""></th>
             <th scope="col">Passport</th>
             <th scope="col">Document no.</th>
             <th scope="col">Expiry date</th>
@@ -38,8 +43,8 @@
         {% for passport in passport_list %}
             <tr>
                 <th scope="row">{{ passport.id }}</th>
+                <th><input class="form-check-input" type="checkbox" id="checkboxNoLabel" value=""></th>
                 <td><a href="{% url 'customers:passport_detail' passport.id %}">{{ passport }}</a></td>
-{#                <td><a href="#">{{ passport }}</a></td>#}
                 <td>{{ passport.document_number }}</td>
                 <td>{{ passport.expiry_date }}</td>
                 <td>{{ passport.created_delta }}</td>
@@ -72,5 +77,30 @@
             </ul>
         </nav>
     {% endif %}
+
+    <!-- CheckBox Script -->
+    <script>
+
+        const selectAllCheckBox = document.getElementById("selectAllCheckBox");
+        const checkboxes = document.querySelectorAll(".form-check-input");
+        const deleteButton = document.getElementById("deleteButton");
+
+        function toggleDeleteButton(){
+            const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+            deleteButton.disabled = !anyChecked
+        }
+
+        selectAllCheckBox.addEventListener('change', function () {
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = this.checked;
+            })
+            toggleDeleteButton();
+        })
+
+        checkboxes.forEach(checkbox => {
+            checkbox.addEventListener('change', toggleDeleteButton);
+        })
+
+    </script>
 
 {% endblock %}

@@ -2,17 +2,17 @@ from django.core.paginator import Paginator
 from django.db.models.functions import datetime
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
-from django.views.generic import ListView, DeleteView
+from django.views.generic import DeleteView
 from django.urls import reverse_lazy
 
 from customers.models import Customer, Passport, PageScan
 from customers.recognition import get_passport_data, get_text_data
 from customers.forms import PageScanForm, PassportForm, CustomerForm
-from customers.models import state_code
 
 
 def catalog(request):
-    return render(request, 'customers/catalog.html')
+    context = {'title': 'Root Page'}
+    return render(request, 'customers/catalog.html', context)
 
 
 # ====================================================
@@ -20,26 +20,20 @@ def catalog(request):
 # ====================================================
 
 
-class PageScanList(ListView):
-    model = PageScan
-    template_name = 'customers/pagescan-list.html'
-
-
 def pagescan_list(request):
-
     page = int(request.GET.get('page', 1))
-
     paginator = Paginator(PageScan.objects.all().order_by('-id'), 6)
     current_page = paginator.page(page)
-
-    context = {'pagescan_list': current_page, }
+    context = {'pagescan_list': current_page,
+               'title': 'Page Scans', }
     return render(request, 'customers/pagescan-list.html', context)
 
 
 def pagescan_create(request):
 
     if request.method == 'GET':
-        context = {'form': PageScanForm, }
+        context = {'form': PageScanForm,
+                   'title': 'Page Scan: Create', }
         return render(request, 'customers/pagescan-create.html', context)
 
     elif request.method == 'POST':
@@ -56,9 +50,10 @@ def pagescan_create(request):
 
 
 def pagescan_detail(request, pk):
-
+    pagescan = PageScan.objects.get(pk=pk)
     context = {'form': PageScanForm,
-               'pagescan': PageScan.objects.get(pk=pk), }
+               'pagescan': pagescan,
+               'title': f'Page Scan: {pagescan}'}
     return render(request, 'customers/pagescan-detail.html', context)
 
 
@@ -73,27 +68,24 @@ class PageScanDelete(DeleteView):
 # ===================================================
 
 
-class PassportList(ListView):
-    model = Passport
-    template_name = 'customers/passport-list.html'
-
-
 def passport_list(request):
-
     page = int(request.GET.get('page', 1))
-
     paginator = Paginator(Passport.objects.all().order_by('-id'), 12)
     current_page = paginator.page(page)
-
-    context = {'passport_list': current_page, }
+    context = {'passport_list': current_page,
+               'title': 'Passports'}
     return render(request, 'customers/passport-list.html', context)
 
 
 def passport_create(request):
 
     if request.method == 'GET':
+
+        from customers.models import state_code
+
         context = {'form': PassportForm,
-                   'state_code': state_code, }
+                   'state_code': state_code,
+                   'title': 'Passport: Create'}
         return render(request, 'customers/passport-detail.html', context)
 
     elif request.method == 'POST':
@@ -117,11 +109,15 @@ def passport_create(request):
 def passport_detail(request, pk):
 
     if request.method == 'GET':
+
+        from customers.models import state_code
+
         passport = Passport.objects.get(pk=pk)
         context = {'passport': passport,
                    'form': PassportForm(instance=passport),
                    'issuer_code': state_code[passport.issuer_code],
-                   'nationality_code': state_code[passport.nationality_code]}
+                   'nationality_code': state_code[passport.nationality_code],
+                   'title': f'Passport: {passport}'}
         return render(request, 'customers/passport-detail.html', context)
 
     elif request.method == 'POST':
@@ -143,26 +139,20 @@ class PassportDelete(DeleteView):
 # ===================================================
 
 
-class CustomerList(ListView):
-    model = Customer
-    template_name = 'customers/customer-list.html'
-
-
 def customer_list(request):
-
     page = int(request.GET.get('page', 1))
-
     paginator = Paginator(Customer.objects.all().order_by('-id'), 12)
     current_page = paginator.page(page)
-
-    context = {'customer_list': current_page, }
+    context = {'customer_list': current_page,
+               'title': 'Customers', }
     return render(request, 'customers/customer-list.html', context)
 
 
 def customer_create(request):
 
     if request.method == 'GET':
-        context = {'form': CustomerForm, }
+        context = {'form': CustomerForm,
+                   'title': 'Customer: Create', }
         return render(request, 'customers/customer-detail.html', context)
 
     elif request.method == 'POST':
@@ -178,7 +168,8 @@ def customer_detail(request, pk):
     if request.method == 'GET':
         customer = Customer.objects.get(pk=pk)
         context = {'customer': customer,
-                   'form': CustomerForm(instance=customer), }
+                   'form': CustomerForm(instance=customer),
+                   'title': f'Customer: {customer}'}
         return render(request, 'customers/customer-detail.html', context)
 
     elif request.method == 'POST':
@@ -193,3 +184,12 @@ class CustomerDelete(DeleteView):
     model = Customer
     template_name = 'customers/customer-confirm-delete.html'
     success_url = reverse_lazy('customers:customer_list')
+
+
+def customer_multi_delete(request):
+
+    if request.method == 'GET':
+        return
+
+    elif request.method == 'POST':
+        return

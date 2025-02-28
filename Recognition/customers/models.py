@@ -1,6 +1,5 @@
 from django.db import models
 from django.db.models.functions import datetime
-from django.templatetags.tz import utc
 from django.utils import timezone
 
 

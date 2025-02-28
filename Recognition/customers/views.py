@@ -39,7 +39,7 @@ def pagescan_create(request):
     if request.method == 'GET':
         context = {'form': PageScanForm,
                    'title': 'Page Scan: Create', }
-        return render(request, 'customers/pagescan-create.html', context)
+        return render(request, 'customers/pagescan-detail.html', context)
 
     elif request.method == 'POST':
         form = PageScanForm(request.POST, request.FILES)
@@ -56,26 +56,23 @@ def pagescan_create(request):
 
 def pagescan_detail(request, pk):
     pagescan = PageScan.objects.get(pk=pk)
-    context = {'form': PageScanForm,
-               'pagescan': pagescan,
+    context = {'pagescan': pagescan,
                'title': f'Page Scan: {pagescan}'}
     return render(request, 'customers/pagescan-detail.html', context)
 
 
-class PageScanDelete(DeleteView):
-    model = PageScan
-    template_name = 'customers/pagescan-confirm-delete.html'
-    success_url = reverse_lazy('customers:pagescan_list')
+def pagescan_delete(request, pk=None):
 
-
-def pagescan_list_delete(request):
-
-    ids = (int(item) for item in request.GET.getlist('is_checked'))
+    if pk:
+        ids = [pk]
+    else:
+        ids = (int(item) for item in request.GET.getlist('is_checked'))
 
     if request.method == 'GET':
         context = {'object_list': PageScan.objects.filter(pk__in=ids),
-                   'title': 'Page Scans: Delete'}
-        return render(request, 'customers/pagescan-confirm-delete.html', context)
+                   'title': 'Page Scans: Delete',
+                   'pagescan': True, }
+        return render(request, 'customers/confirm-delete.html', context)
 
     elif request.method == 'POST':
         for pk in ids:
@@ -152,20 +149,18 @@ def passport_detail(request, pk):
         return HttpResponseRedirect(reverse_lazy('customers:passport_list'))
 
 
-class PassportDelete(DeleteView):
-    model = Passport
-    template_name = 'customers/passport-confirm-delete.html'
-    success_url = reverse_lazy('customers:passport_list')
+def passport_delete(request, pk=None):
 
-
-def passport_list_delete(request):
-
-    ids = (int(item) for item in request.GET.getlist('is_checked'))
+    if pk:
+        ids = [pk]
+    else:
+        ids = (int(item) for item in request.GET.getlist('is_checked'))
 
     if request.method == 'GET':
         context = {'object_list': Passport.objects.filter(pk__in=ids),
-                   'title': 'Passports: Delete'}
-        return render(request, 'customers/passport-confirm-delete.html', context)
+                   'title': 'Passports: Delete',
+                   'passport': True, }
+        return render(request, 'customers/confirm-delete.html', context)
 
     elif request.method == 'POST':
         for pk in ids:
@@ -227,20 +222,18 @@ def customer_detail(request, pk):
         return HttpResponseRedirect(reverse_lazy('customers:customer_list'))
 
 
-class CustomerDelete(DeleteView):
-    model = Customer
-    template_name = 'customers/customer-confirm-delete.html'
-    success_url = reverse_lazy('customers:customer_list')
+def customer_delete(request, pk=None):
 
-
-def customer_list_delete(request):
-
-    ids = (int(item) for item in request.GET.getlist('is_checked'))
+    if pk:
+        ids = [pk]
+    else:
+        ids = (int(item) for item in request.GET.getlist('is_checked'))
 
     if request.method == 'GET':
         context = {'object_list': Customer.objects.filter(pk__in=ids),
-                   'title': 'Customers: Delete'}
-        return render(request, 'customers/customer-confirm-delete.html', context)
+                   'title': 'Customers: Delete',
+                   'customer': True}
+        return render(request, 'customers/confirm-delete.html', context)
 
     elif request.method == 'POST':
         for pk in ids:

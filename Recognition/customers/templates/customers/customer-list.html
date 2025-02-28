@@ -13,7 +13,7 @@
     </nav>
 
     <!-- Multiple delete form-->
-    <form action="{% url 'customers:customer_list_delete' %}" method="get">
+    <form action="{% url 'customers:customer_delete' %}" method="get">
         {% csrf_token %}
 
         <!-- Page header -->

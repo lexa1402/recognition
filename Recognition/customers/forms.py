@@ -24,3 +24,9 @@ class CustomerForm(forms.ModelForm):
     class Meta:
         model = Customer
         fields = ['passport', 'address', 'phone_number', 'email', ]
+
+
+class CustomerListForm(forms.Form):
+    is_checked = forms.ModelMultipleChoiceField(queryset=Customer.objects.all(),
+                                                required=False,
+                                                widget=forms.CheckboxSelectMultiple)

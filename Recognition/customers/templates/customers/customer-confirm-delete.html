@@ -1,4 +1,5 @@
 {% extends 'customers/base.html' %}
+{% load crispy_forms_filters %}
 {% load crispy_forms_tags %}
 
 
@@ -8,7 +9,9 @@
         <ol class="breadcrumb">
             <li class="breadcrumb-item"><a href="{% url 'customers:catalog' %}">Root</a></li>
             <li class="breadcrumb-item"><a href="{% url 'customers:customer_list' %}">Customers</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'customers:customer_detail' object.id %}">{{ object }}</a></li>
+            {% if object %}
+                <li class="breadcrumb-item"><a href="{% url 'customers:customer_detail' object.id %}">{{ object }}</a></li>
+            {% endif %}
             <li class="breadcrumb-item active" aria-current="page">[Delete]</li>
         </ol>
     </nav>
@@ -22,7 +25,8 @@
     <form method="post" class="row g-3" style="margin-top: 8px">
         {% csrf_token %}
         <div class="col-md-12">
-            <p>Are you sure you want to delete "{{ object }}"?</p>
+            <p>Are you sure you want to delete "{{ object }}
+                {% for customer in customers %}{{ customer }}, {% endfor %}"?</p>
         </div>
         {{ form|crispy }}
         <div class="col-md-12">

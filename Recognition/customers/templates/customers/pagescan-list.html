@@ -12,70 +12,86 @@
         </ol>
     </nav>
 
-    <!-- Page header -->
-    <div class="row g-3" style="margin-top: 24px">
-        <div class="col-md-6">
-            <h3>Page Scans:</h3>
-        </div>
-        <div class="col-md-6 d-md-flex justify-content-md-end">
-            <div class="btn-group me-2">
-                <a class="btn btn-primary" href="{% url 'customers:pagescan_create' %}" role="button">Create</a>
-            </div>
-            <div class="btn-group me-2">
-                <button type="button" class="btn btn-danger" id="deleteButton" disabled>Delete</button>
-            </div>
-        </div>
-    </div>
+    <!-- Multiple delete form-->
+    <form action="{% url 'customers:pagescan_list_delete' %}" method="get">
+        {% csrf_token %}
 
-    <!-- Pagescans Table -->
-    <table class="table" style="margin-top: 16px">
-        <thead>
-        <tr>
-            <th scope="col">id</th>
-            <th scope="col"><input class="form-check-input" type="checkbox" id="selectAllCheckBox" value=""></th>
-            <th scope="col">Page Scan</th>
-            <th scope="col">MRZ</th>
-            <th scope="col">Preview</th>
-            <th scope="col">Created</th>
-        </tr>
-        </thead>
-        <tbody>
-        {% for pagescan in pagescan_list %}
+        <!-- Page header -->
+        <div class="row g-3" style="margin-top: 24px">
+            <div class="col-md-6">
+                <h3>Page Scans:</h3>
+            </div>
+            <div class="col-md-6 d-md-flex justify-content-md-end">
+                <div class="btn-group me-2">
+                    <a class="btn btn-primary" href="{% url 'customers:pagescan_create' %}" role="button">Create</a>
+                </div>
+                <div class="btn-group me-2">
+                    <button type="submit" class="btn btn-danger" id="deleteButton" disabled>Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pagescans Table -->
+        <table class="table" style="margin-top: 16px">
+            <thead>
             <tr>
-                <th scope="row">{{ pagescan.id }}</th>
-                <th><input class="form-check-input" type="checkbox" id="checkboxNoLabel" value=""></th>
-                <td><a href="{% url 'customers:pagescan_detail' pagescan.id %}">{{ pagescan }}</a></td>
-                <td>{% if pagescan.mrz_text %} OK {% else %} ERROR {% endif %} </td>
-                <td>
-                    <a href="{% url 'customers:pagescan_detail' pagescan.id %}">
-                        <img src="{{ pagescan.image.url }}" style="width: 100px; height: auto" alt="">
-                    </a>
-                </td>
-                <td>{{ pagescan.created_delta }}</td>
+                <th scope="col">id</th>
+                <th scope="col"><input type="checkbox" id="selectAllCheckBox" value=""></th>
+                <th scope="col">Page Scan</th>
+                <th scope="col">MRZ</th>
+                <th scope="col">Preview</th>
+                <th scope="col">Created</th>
             </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            {% for pagescan in pagescan_list %}
+                <tr>
+                    <th scope="row">{{ pagescan.id }}</th>
+                    <th>
+                        {% for field in form %}
+                            {% for checkbox in field %}
+                                {% if checkbox.data.value == pagescan.id %}
+                                    {{ checkbox.tag }}
+                                {% endif %}
+                            {% endfor %}
+                        {% endfor %}
+                    </th>
+                    <td><a href="{% url 'customers:pagescan_detail' pagescan.id %}">{{ pagescan }}</a></td>
+                    <td>{% if pagescan.mrz_text %} OK {% else %} ERROR {% endif %} </td>
+                    <td>
+                        <a href="{% url 'customers:pagescan_detail' pagescan.id %}">
+                            <img src="{{ pagescan.image.url }}" style="width: 100px; height: auto" alt="">
+                        </a>
+                    </td>
+                    <td>{{ pagescan.created_delta }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </form>
 
     <!-- Paginator -->
     {% if pagescan_list.paginator.num_pages > 1 %}
         <nav aria-label="Paginator">
             <ul class="pagination">
                 <li class="page-item {% if not pagescan_list.has_previous %} disabled {% endif %}">
-                    <a class="page-link" href="{% if pagescan_list.has_previous %}?{% change_params page=pagescan_list.previous_page_number %}
+                    <a class="page-link"
+                       href="{% if pagescan_list.has_previous %}?{% change_params page=pagescan_list.previous_page_number %}
                     {% else %}#{% endif %}" tabindex="-1" aria-disabled="true">Previous</a>
                 </li>
 
                 {% for page in pagescan_list.paginator.page_range %}
                     {% if page >= pagescan_list.number|add:-2 and page <= pagescan_list.number|add:2 %}
-                        <li class="page-item {% if page == pagescan_list.number %} active {% endif %}" aria-current="page">
+                        <li class="page-item {% if page == pagescan_list.number %} active {% endif %}"
+                            aria-current="page">
                             <a class="page-link" href="?{% change_params page=page %}">{{ page }}</a>
                         </li>
                     {% endif %}
                 {% endfor %}
 
                 <li class="page-item {% if not pagescan_list.has_next %} disabled {% endif %}">
-                    <a class="page-link" href="{% if pagescan_list.has_next %}?{% change_params page=pagescan_list.next_page_number %}
+                    <a class="page-link"
+                       href="{% if pagescan_list.has_next %}?{% change_params page=pagescan_list.next_page_number %}
                     {% else %}#{% endif %} ">Next</a>
                 </li>
             </ul>
@@ -86,10 +102,10 @@
     <script>
 
         const selectAllCheckBox = document.getElementById("selectAllCheckBox");
-        const checkboxes = document.querySelectorAll(".form-check-input");
+        const checkboxes = document.getElementsByName("is_checked");
         const deleteButton = document.getElementById("deleteButton");
 
-        function toggleDeleteButton(){
+        function toggleDeleteButton() {
             const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
             deleteButton.disabled = !anyChecked
         }

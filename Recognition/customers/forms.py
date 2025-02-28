@@ -10,7 +10,8 @@ class PageScanForm(forms.Form):
 
 class PassportForm(forms.ModelForm):
     
-    page_scan = forms.ModelMultipleChoiceField(queryset=PageScan.objects.filter(~Q(mrz_text=None)), required=True)
+    page_scan = forms.ModelMultipleChoiceField(queryset=PageScan.objects.filter(~Q(mrz_text=None)).order_by('-id'),
+                                               required=True)
 
     class Meta:
         model = Passport
@@ -19,7 +20,8 @@ class PassportForm(forms.ModelForm):
 
 class CustomerForm(forms.ModelForm):
 
-    passport = forms.ModelChoiceField(queryset=Passport.objects.all(), required=True)
+    passport = forms.ModelChoiceField(queryset=Passport.objects.all().order_by('-id'),
+                                      required=True)
 
     class Meta:
         model = Customer
@@ -28,5 +30,17 @@ class CustomerForm(forms.ModelForm):
 
 class CustomerListForm(forms.Form):
     is_checked = forms.ModelMultipleChoiceField(queryset=Customer.objects.all(),
+                                                required=False,
+                                                widget=forms.CheckboxSelectMultiple)
+
+
+class PassportListForm(forms.Form):
+    is_checked = forms.ModelMultipleChoiceField(queryset=Passport.objects.all(),
+                                                required=False,
+                                                widget=forms.CheckboxSelectMultiple)
+
+
+class PageScanListForm(forms.Form):
+    is_checked = forms.ModelMultipleChoiceField(queryset=PageScan.objects.all(),
                                                 required=False,
                                                 widget=forms.CheckboxSelectMultiple)

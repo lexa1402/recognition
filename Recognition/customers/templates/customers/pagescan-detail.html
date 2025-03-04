@@ -26,7 +26,7 @@
         {% endif %}
     </div>
 
-    <form method="POST" enctype="multipart/form-data" action="" class="row g-3" style="margin-top: 8px">
+    <form method="POST" enctype="multipart/form-data" action="" class="row g-3" style="margin-top: 8px" id="form">
         {% csrf_token %}
         <div class="col-md-3">
             {% if form %}
@@ -42,9 +42,22 @@
         </div>
         {% if form %}
             <div class="col-12">
-                <button type="submit" class="btn btn-primary">Save</button>
+                <button type="submit" class="btn btn-primary" id="save_btn">Save</button>
+                <button class="btn btn-primary" type="button" id="load_btn" disabled hidden>
+                    <span class="spinner-border spinner-border-sm" role="status"></span>
+                    Wait...
+                </button>
             </div>
         {% endif %}
     </form>
+
+    <script>
+
+        document.getElementById("form").addEventListener('submit', function () {
+            document.getElementById("save_btn").hidden = true;
+            document.getElementById("load_btn").hidden = false;
+        })
+
+    </script>
 
 {% endblock %}

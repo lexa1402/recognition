@@ -23,6 +23,10 @@
             </div>
             <div class="col-md-6 d-md-flex justify-content-md-end">
                 <div class="btn-group me-2">
+                    <a class="btn btn-secondary {% if not register %} disabled {% endif %}"
+                       href="{% url 'customers:passport_upload' %}" role="button">Register free MRZs</a>
+                </div>
+                <div class="btn-group me-2">
                     <a class="btn btn-primary" href="{% url 'customers:passport_create' %}" role="button">Create</a>
                 </div>
                 <div class="btn-group me-2">
@@ -40,6 +44,7 @@
                 <th scope="col">Passport</th>
                 <th scope="col">Document no.</th>
                 <th scope="col">Expiry date</th>
+{#                <th scope="col">Page Scan</th>#}
                 <th scope="col">Created</th>
             </tr>
             </thead>
@@ -59,6 +64,13 @@
                     <td><a href="{% url 'customers:passport_detail' passport.id %}">{{ passport }}</a></td>
                     <td>{{ passport.document_number }}</td>
                     <td>{{ passport.expiry_date }}</td>
+{#                    <td>#}
+{#                        {% for pagescan in pagescan_list %}#}
+{#                            {% if pagescan.id == passport.page_scan %}#}
+{#                                <a href="{% url 'customers:pagescan_detail' pagescan.id %}">{{ pagescan }}</a>#}
+{#                            {% endif %}#}
+{#                        {% endfor %}#}
+{#                    </td>#}
                     <td>{{ passport.created_delta }}</td>
                 </tr>
             {% endfor %}

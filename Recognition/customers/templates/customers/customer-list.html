@@ -23,6 +23,10 @@
             </div>
             <div class="col-md-6 d-md-flex justify-content-md-end">
                 <div class="btn-group me-2">
+                    <a class="btn btn-secondary {% if not register %} disabled {% endif %}"
+                       href="{% url 'customers:customer_upload' %}" role="button">Register free Passports</a>
+                </div>
+                <div class="btn-group me-2">
                     <a class="btn btn-primary" href="{% url 'customers:customer_create' %}" role="button">Create</a>
                 </div>
                 <div class="btn-group me-2">
@@ -38,8 +42,9 @@
                 <th scope="col">id</th>
                 <th scope="col"><input type="checkbox" id="selectAllCheckBox" value=""></th>
                 <th scope="col">Customer</th>
-                <th scope="col">Passport</th>
                 <th scope="col">Phone number</th>
+                <th scope="col">Email</th>
+                <th scope="col">Passport</th>
                 <th scope="col">Created</th>
             </tr>
             </thead>
@@ -57,8 +62,9 @@
                         {% endfor %}
                     </th>
                     <td><a href="{% url 'customers:customer_detail' customer.id %}">{{ customer }}</a></td>
-                    <td><a href="{% url 'customers:passport_detail' customer.passport.id %}">{{ customer }}</a></td>
                     <td>{{ customer.phone_number }}</td>
+                    <td>{{ customer.email }}</td>
+                    <td><a href="{% url 'customers:passport_detail' customer.passport.id %}">{{ customer }}</a></td>
                     <td>{{ customer.created_delta }}</td>
                 </tr>
             {% endfor %}

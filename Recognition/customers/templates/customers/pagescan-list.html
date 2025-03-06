@@ -76,6 +76,12 @@
             <ul class="pagination">
                 <li class="page-item {% if not pagescan_list.has_previous %} disabled {% endif %}">
                     <a class="page-link"
+                       href="{% if pagescan_list.has_previous %}?{% change_params page=1 %}
+                    {% else %}#{% endif %}" tabindex="-1" aria-disabled="true"><<</a>
+                </li>
+
+                <li class="page-item {% if not pagescan_list.has_previous %} disabled {% endif %}">
+                    <a class="page-link"
                        href="{% if pagescan_list.has_previous %}?{% change_params page=pagescan_list.previous_page_number %}
                     {% else %}#{% endif %}" tabindex="-1" aria-disabled="true">Previous</a>
                 </li>
@@ -93,6 +99,12 @@
                     <a class="page-link"
                        href="{% if pagescan_list.has_next %}?{% change_params page=pagescan_list.next_page_number %}
                     {% else %}#{% endif %} ">Next</a>
+                </li>
+
+                <li class="page-item {% if not pagescan_list.has_next %} disabled {% endif %}">
+                    <a class="page-link"
+                       href="{% if pagescan_list.has_next %}?{% change_params page=pagescan_list.paginator.num_pages %}
+                    {% else %}#{% endif %} ">>></a>
                 </li>
             </ul>
         </nav>

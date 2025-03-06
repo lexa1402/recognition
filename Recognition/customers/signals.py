@@ -7,5 +7,4 @@ from customers.models import PageScan
 
 @receiver(pre_delete, sender=PageScan)
 def page_pre_delete(sender, instance, **kwargs):
-    image_path = instance.image.path
-    os.remove(image_path)
+    os.remove(instance.image.path)

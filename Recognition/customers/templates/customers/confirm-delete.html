@@ -17,11 +17,6 @@
                     {% url 'customers:pagescan_list' %}">Page Scans
             {% endif %}</a></li>
 
-            {% if object %}
-                <li class="breadcrumb-item"><a href="{% url 'customers:customer_detail' object.id %}">{{ object }}</a>
-                </li>
-            {% endif %}
-
             <li class="breadcrumb-item active" aria-current="page">[Delete]</li>
         </ol>
     </nav>

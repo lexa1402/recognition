@@ -5,7 +5,7 @@ from django.utils import timezone
 
 def time_delta_format(value):
     delta = int((datetime.datetime.now(tz=timezone.utc) - value).total_seconds() + 21600)
-    dividers = {'second': 60, 'minute': 60, 'hour': 24, 'day': 7, 'week': 4, 'month': 12, 'year': 12}
+    dividers = {'second': 60, 'minute': 60, 'hour': 24, 'day': 7, 'week': 4, 'month': 12, 'year': 1000}
     if delta == 0:
         return 'Just now'
     for key in dividers.keys():
@@ -25,6 +25,10 @@ class Customer(models.Model):
     @property
     def created_delta(self):
         return time_delta_format(self.created)
+
+    @staticmethod
+    def fields():
+        return ['address', 'phone_number', 'email', ]
 
     def __str__(self):
         passport = Passport.objects.get(pk=self.passport.id)
@@ -54,6 +58,11 @@ class Passport(models.Model):
     @property
     def created_delta(self):
         return time_delta_format(self.created)
+
+    @staticmethod
+    def fields():
+        return ['issuer_code', 'surname', 'given_name', 'document_number', 'nationality_code', 'birth_date', 'sex',
+                'expiry_date', 'optional_data_1', 'optional_data_2', ]
 
     def __str__(self):
         return f'{self.surname.title()} {self.given_name.title()}'

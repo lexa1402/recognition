@@ -1,3 +1,4 @@
+from cv2 import imread, convertScaleAbs
 from django.core.paginator import Paginator
 from django.db.models import Q, Count
 from django.db.models.functions import datetime
@@ -5,10 +6,10 @@ from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
 
-from customers.models import Customer, Passport, PageScan
-from customers.recognition import get_passport_data, get_text_data
 from customers.forms import PageScanForm, PassportForm, CustomerForm, CustomerListForm, PassportListForm, \
     PageScanListForm
+from customers.models import Customer, Passport, PageScan
+from customers.recognition import get_text_data, get_mrz
 
 
 def catalog(request):
@@ -51,20 +52,10 @@ def pagescan_create(request):
     elif request.method == 'POST':
         form = PageScanForm(request.POST, request.FILES)
         if form.is_valid():
-            import logging
-            logger = logging.getLogger(__name__)
-            logging.basicConfig(filename=rf'static/logs/upload.log', level=logging.INFO)
             files = form.files.getlist('image')
-            for image in files:
-                mrz_text = None
-                try:
-                    mrz_data = get_passport_data(image.file.name)
-                    if mrz_data['status'] == 'SUCCESS':
-                        mrz_text = mrz_data['mrz_text']
-                        logger.info(f'Successfully detected mrz: {image.name}')
-                except Exception as e:
-                    logger.error(f'An error was occurred with {image.name}: {e}')
-                pagescan = PageScan.objects.create(image=image, mrz_text=mrz_text, created=datetime.datetime.now())
+            for file in files:
+                mrz_text = get_mrz(convertScaleAbs(imread(file.file.name), alpha=0.15))
+                pagescan = PageScan.objects.create(image=file, mrz_text=mrz_text, created=datetime.datetime.now())
             if files.__len__() == 1:
                 return HttpResponseRedirect(reverse('customers:pagescan_detail', kwargs={'pk': pagescan.id}))
         return HttpResponseRedirect(reverse('customers:pagescan_list'))
@@ -106,10 +97,7 @@ def passport_list(request):
                'pagescan_list': PageScan.objects.all(),
                'title': 'Passports',
                'form': PassportListForm(),
-               'register': False, }
-
-    if get_free_pagescans().__len__() > 0:
-        context['register'] = True
+               'register': get_free_pagescans().__len__() > 0, }
 
     return render(request, 'customers/passport-list.html', context)
 

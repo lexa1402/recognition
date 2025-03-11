@@ -33,6 +33,11 @@
                     <button type="submit" class="btn btn-danger" id="deleteButton" disabled>Delete</button>
                 </div>
             </div>
+            <div class="col-md-12">
+                <h6>Page {{ customer_list.number }} of {{ customer_list.paginator.num_pages }}
+                    ({{ customer_list.end_index|sub:customer_list.start_index|add:1 }} Customers
+                    of {{ customer_list.paginator.count }} shown)</h6>
+            </div>
         </div>
 
         <!-- Customers table -->

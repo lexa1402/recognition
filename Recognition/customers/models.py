@@ -1,4 +1,5 @@
 from django.db import models
+from django.db.models import Count, Q
 from django.db.models.functions import datetime
 from django.utils import timezone
 
@@ -94,6 +95,14 @@ class PageScan(models.Model):
         app_label = 'customers'
         db_table = 'pagescan'
         verbose_name = 'Page Scan'
+
+
+def get_free_pagescans():
+    return PageScan.objects.annotate(counter=Count('passport')).filter(counter=0).filter(~Q(mrz_text=None))
+
+
+def get_free_passports():
+    return Passport.objects.annotate(counter=Count('customer')).filter(counter=0)
 
 
 state_code = {

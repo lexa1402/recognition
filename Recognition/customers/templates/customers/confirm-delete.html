@@ -43,7 +43,15 @@
         </div>
         {{ form|crispy }}
         <div class="col-md-12">
-            <button class="btn btn-primary" type="submit" value="Confirm">Delete</button>
+            <button class="btn btn-danger" type="submit" value="Confirm">Delete</button>
+            <button class="btn btn-secondary" href="
+                {% if customer %}
+                    {% url 'customers:customer_list' %}
+                {% elif passport %}
+                    {% url 'customers:passport_list' %}
+                {% elif pagescan %}
+                    {% url 'customers:pagescan_list' %}
+            {% endif %} ">Cancel</button>
         </div>
     </form>
 

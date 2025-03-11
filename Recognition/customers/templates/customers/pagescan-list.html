@@ -29,6 +29,11 @@
                     <button type="submit" class="btn btn-danger" id="deleteButton" disabled>Delete</button>
                 </div>
             </div>
+            <div class="col-md-12d">
+                <h6>Page {{ pagescan_list.number }} of {{ pagescan_list.paginator.num_pages }}
+                    ({{ pagescan_list.end_index|sub:pagescan_list.start_index|add:1 }} Page Scans
+                    of {{ pagescan_list.paginator.count }} shown)</h6>
+            </div>
         </div>
 
         <!-- Pagescans Table -->
@@ -60,7 +65,8 @@
                     <td>{% if pagescan.mrz_text %} OK {% else %} ERROR {% endif %} </td>
                     <td>
                         <a href="{% url 'customers:pagescan_detail' pagescan.id %}">
-                            <img src="{{ pagescan.image.url }}" style="width: 100px; height: auto" alt="">
+                            <img src="{{ pagescan.image.url }}"
+                                 style="width: 120px; height: 80px; object-fit: cover; border-radius: 4px">
                         </a>
                     </td>
                     <td>{{ pagescan.created_delta }}</td>

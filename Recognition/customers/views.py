@@ -1,28 +1,20 @@
 from cv2 import imread, convertScaleAbs
 from django.core.paginator import Paginator
-from django.db.models import Q, Count
 from django.db.models.functions import datetime
 from django.http.response import HttpResponseRedirect
 from django.shortcuts import render
 from django.urls import reverse
+from django.contrib import messages
 
 from customers.forms import PageScanForm, PassportForm, CustomerForm, CustomerListForm, PassportListForm, \
     PageScanListForm
-from customers.models import Customer, Passport, PageScan
+from customers.models import Customer, Passport, PageScan, get_free_passports, get_free_pagescans
 from customers.recognition import get_text_data, get_mrz
 
 
 def catalog(request):
-    context = {'title': 'Root Page'}
+    context = {'title': 'Root Page', }
     return render(request, 'customers/catalog.html', context)
-
-
-def get_free_pagescans():
-    return PageScan.objects.annotate(counter=Count('passport')).filter(counter=0).filter(~Q(mrz_text=None))
-
-
-def get_free_passports():
-    return Passport.objects.annotate(counter=Count('customer')).filter(counter=0)
 
 
 # ==================================================== #
@@ -37,7 +29,7 @@ def pagescan_list(request):
 
     context = {'pagescan_list': current_page,
                'title': 'Page Scans',
-               'form': PageScanListForm()}
+               'form': PageScanListForm(), }
 
     return render(request, 'customers/pagescan-list.html', context)
 
@@ -54,22 +46,24 @@ def pagescan_create(request):
         if form.is_valid():
             files = form.files.getlist('image')
             for file in files:
-                mrz_text = get_mrz(convertScaleAbs(imread(file.file.name), alpha=0.15))
+                mrz_text = get_mrz(convertScaleAbs(imread(file.file.name), alpha=0.18))
                 pagescan = PageScan.objects.create(image=file, mrz_text=mrz_text, created=datetime.datetime.now())
             if files.__len__() == 1:
+                messages.success(request, 'Page scan uploaded.')
                 return HttpResponseRedirect(reverse('customers:pagescan_detail', kwargs={'pk': pagescan.id}))
+            messages.success(request, f'Page scans ({files.__len__()}) uploaded')
         return HttpResponseRedirect(reverse('customers:pagescan_list'))
 
 
 def pagescan_detail(request, pk):
     pagescan = PageScan.objects.get(pk=pk)
     context = {'pagescan': pagescan,
-               'title': f'Page Scan: {pagescan}'}
+               'title': f'Page Scan: {pagescan}', }
     return render(request, 'customers/pagescan-detail.html', context)
 
 
 def pagescan_delete(request, pk=None):
-    ids = [pk] if pk else (int(item) for item in request.GET.getlist('is_checked'))
+    ids = [pk] if pk else [int(item) for item in request.GET.getlist('is_checked')]
 
     if request.method == 'GET':
         context = {'object_list': PageScan.objects.filter(pk__in=ids),
@@ -80,6 +74,7 @@ def pagescan_delete(request, pk=None):
     elif request.method == 'POST':
         for pk in ids:
             PageScan.objects.get(pk=pk).delete()
+        messages.info(request, f'Page scans ({ids.__len__()}) deleted.')
         return HttpResponseRedirect(reverse('customers:pagescan_list'))
 
 
@@ -108,7 +103,7 @@ def passport_create(request):
         from customers.models import state_code
         context = {'form': PassportForm,
                    'state_code': state_code,
-                   'title': 'Passport: Create'}
+                   'title': 'Passport: Create', }
         return render(request, 'customers/passport-detail.html', context)
 
     elif request.method == 'POST':
@@ -120,6 +115,7 @@ def passport_create(request):
                 **{key: mrz_data[key] for key in filter(lambda key: key in Passport.fields(), mrz_data)},
                 created=datetime.datetime.now(), )
             passport.page_scan.add(pagescan)
+            messages.success(request, f'Passport ({passport}) created.')
             return HttpResponseRedirect(reverse('customers:passport_detail', kwargs={'pk': passport.id}))
         return HttpResponseRedirect(reverse('customers:passport_list'))
 
@@ -131,21 +127,21 @@ def passport_detail(request, pk):
         passport = Passport.objects.get(pk=pk)
         context = {'passport': passport,
                    'form': PassportForm(instance=passport),
-                   'issuer_code': state_code[passport.issuer_code],
-                   'nationality_code': state_code[passport.nationality_code],
-                   'title': f'Passport: {passport}'}
+                   'issuer': state_code[passport.issuer_code],
+                   'nationality': state_code[passport.nationality_code],
+                   'title': f'Passport: {passport}', }
         return render(request, 'customers/passport-detail.html', context)
 
     elif request.method == 'POST':
         form = PassportForm(request.POST, instance=Passport.objects.get(pk=pk))
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('customers:passport_list'))
+            messages.info(request, f'Passport ({form.instance}) changes saved.')
         return HttpResponseRedirect(reverse('customers:passport_list'))
 
 
 def passport_delete(request, pk=None):
-    ids = [pk] if pk else (int(item) for item in request.GET.getlist('is_checked'))
+    ids = (pk, ) if pk else [int(item) for item in request.GET.getlist('is_checked')]
 
     if request.method == 'GET':
         context = {'object_list': Passport.objects.filter(pk__in=ids),
@@ -156,16 +152,19 @@ def passport_delete(request, pk=None):
     elif request.method == 'POST':
         for pk in ids:
             Passport.objects.get(pk=pk).delete()
+        messages.info(request, f'Passport(s) ({ids.__len__()}) deleted.')
         return HttpResponseRedirect(reverse('customers:passport_list'))
 
 
 def passport_upload(request):
-    for pagescan in get_free_pagescans():
+    free_scans = get_free_pagescans()
+    for pagescan in free_scans:
         mrz_data = get_text_data(pagescan.mrz_text.replace('\\n', '\n'))
         passport = Passport.objects.create(
             **{key: mrz_data[key] for key in filter(lambda key: key in Passport.fields(), mrz_data.keys())},
             created=datetime.datetime.now(), )
         passport.page_scan.add(pagescan)
+    messages.success(request, f'Passports ({free_scans.__len__()}) created.')
     return HttpResponseRedirect(reverse('customers:passport_list'))
 
 
@@ -201,6 +200,7 @@ def customer_create(request):
                 **{key: form.data[key] for key in Customer.fields()},
                 passport=Passport.objects.get(pk=form.data['passport']),
                 created=datetime.datetime.now(), )
+            messages.success(request, f'Customer ({customer}) created')
             return HttpResponseRedirect(reverse('customers:customer_detail', kwargs={'pk': customer.id}))
         return HttpResponseRedirect(reverse('customers:customer_list'))
 
@@ -218,12 +218,13 @@ def customer_detail(request, pk):
         form = CustomerForm(request.POST, instance=Customer.objects.get(pk=pk))
         if form.is_valid():
             form.save()
+            messages.info(request, f'Customer ({form.instance}) changes saved')
             return HttpResponseRedirect(reverse('customers:customer_list'))
         return HttpResponseRedirect(reverse('customers:customer_list'))
 
 
 def customer_delete(request, pk=None):
-    ids = [pk] if pk else (int(item) for item in request.GET.getlist('is_checked'))
+    ids = (pk, ) if pk else [int(item) for item in request.GET.getlist('is_checked')]
 
     if request.method == 'GET':
         context = {'object_list': Customer.objects.filter(pk__in=ids),
@@ -234,10 +235,13 @@ def customer_delete(request, pk=None):
     elif request.method == 'POST':
         for pk in ids:
             Customer.objects.get(pk=pk).delete()
+        messages.info(request, f'Customers ({ids.__len__()}) deleted.')
         return HttpResponseRedirect(reverse('customers:customer_list'))
 
 
 def customer_upload(request):
-    for passport in get_free_passports():
+    free_passports = get_free_passports()
+    for passport in free_passports:
         Customer.objects.create(passport=passport, created=datetime.datetime.now())
+    messages.info(request, f'Customers ({free_passports.__len__()}) created.')
     return HttpResponseRedirect(reverse('customers:customer_list'))

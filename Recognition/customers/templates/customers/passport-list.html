@@ -12,7 +12,7 @@
         </ol>
     </nav>
 
-    <!-- Multiple delete form-->
+    <!-- Multiple delete form -->
     <form action="{% url 'customers:passport_delete' %}" method="get">
         {% csrf_token %}
 
@@ -33,6 +33,11 @@
                     <button type="submit" class="btn btn-danger" id="deleteButton" disabled>Delete</button>
                 </div>
             </div>
+            <div class="col-md-12">
+                <h6>Page {{ passport_list.number }} of {{ passport_list.paginator.num_pages }}
+                    ({{ passport_list.end_index|sub:passport_list.start_index|add:1 }} Passports
+                    of {{ passport_list.paginator.count }} shown)</h6>
+            </div>
         </div>
 
         <!-- Passports table -->
@@ -44,7 +49,6 @@
                 <th scope="col">Passport</th>
                 <th scope="col">Document no.</th>
                 <th scope="col">Expiry date</th>
-{#                <th scope="col">Page Scan</th>#}
                 <th scope="col">Created</th>
             </tr>
             </thead>
@@ -64,13 +68,6 @@
                     <td><a href="{% url 'customers:passport_detail' passport.id %}">{{ passport }}</a></td>
                     <td>{{ passport.document_number }}</td>
                     <td>{{ passport.expiry_date }}</td>
-{#                    <td>#}
-{#                        {% for pagescan in pagescan_list %}#}
-{#                            {% if pagescan.id == passport.page_scan %}#}
-{#                                <a href="{% url 'customers:pagescan_detail' pagescan.id %}">{{ pagescan }}</a>#}
-{#                            {% endif %}#}
-{#                        {% endfor %}#}
-{#                    </td>#}
                     <td>{{ passport.created_delta }}</td>
                 </tr>
             {% endfor %}
